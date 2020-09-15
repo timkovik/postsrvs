@@ -256,5 +256,20 @@
     },
     "is_top_level": false,
     "variables": {}
+  },
+  "cordova-plugin-ionic": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-ionic"
+    },
+    "is_top_level": true,
+    "variables": {
+      "APP_ID": "076440ef",
+      "CHANNEL_NAME": "Production",
+      "UPDATE_METHOD": "auto",
+      "MAX_STORE": "2",
+      "MIN_BACKGROUND_DURATION": "30",
+      "UPDATE_API": "https://api.ionicjs.com"
+    }
   }
 }

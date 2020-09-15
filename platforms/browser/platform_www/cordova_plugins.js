@@ -508,6 +508,26 @@ module.exports = [
         "id": "cordova-plugin-googlemaps.PluginEnvironment",
         "pluginId": "cordova-plugin-googlemaps",
         "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-ionic/dist/common.js",
+        "id": "cordova-plugin-ionic.common",
+        "pluginId": "cordova-plugin-ionic",
+        "clobbers": [
+            "IonicCordova"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-ionic/dist/guards.js",
+        "id": "cordova-plugin-ionic.guards",
+        "pluginId": "cordova-plugin-ionic",
+        "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-ionic/src/browser/IonicCordovaCommon.js",
+        "id": "cordova-plugin-ionic.IonicCordovaCommon",
+        "pluginId": "cordova-plugin-ionic",
+        "runs": true
     }
 ];
 module.exports.metadata = 
@@ -528,6 +548,7 @@ module.exports.metadata =
     "cordova-plugin-screen-orientation": "3.0.2",
     "cordova.plugins.diagnostic": "5.0.2",
     "phonegap-plugin-barcodescanner": "8.1.0",
+
     "cordova-sqlite-storage": "5.0.1",
     "cordova-plugin-splashscreen": "6.0.0",
     "cordova-plugin-appversion": "1.0.0",
@@ -536,6 +557,7 @@ module.exports.metadata =
     "cordova-plugin-googlemaps": "2.8.0-20200709-2008",
     "cordova-plugin-androidx": "2.0.0",
     "cordova-plugin-firebasex": "10.2.0-cli"
+
 }
 // BOTTOM OF METADATA
 });
