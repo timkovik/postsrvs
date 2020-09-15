@@ -1,30 +1,51 @@
 // Здравый код, растущий рядом с какахами
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { Device } from '@ionic-native/device/ngx';
 import { ToastController } from '@ionic/angular';
+import { Observable } from 'rxjs';
+import { Order } from '../interfaces/order';
 import { Response } from '../interfaces/response';
+
 @Injectable({
   providedIn: 'root'
 })
 export class SysService {
   public ordersIds: Array<string>;
   public proxy: string = 'http://mobile.postsrvs.ru:8080/';
+  public orders: Array<Order>
 
   constructor(
     private http: HttpClient,
     private device: Device,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private camera: Camera
   ) {
 
-
+  }
+  //Распознавание текста
+  async doOCR(base64Image: string, noSkip = true) {
+    //  if(noSkip){
+    // const worker = createWorker({
+    //   logger: m => console.log(m),
+    // });
+    // await worker.load();
+    // await worker.loadLanguage('rus');
+    // await worker.initialize('rus');
+    // const {data:{text}} = await worker.recognize(base64Image);
+    // console.log('sys:: распознанные данные с чека: ', text);
+    // await worker.terminate();
+    // return text;
+    //  }else{
+    return ''
+    //  }
 
 
   }
-
   //Получение списка заказов по idшникам
-  public getOrders(ids: Array<string>): Observable<any> {
+  public getOrders(ids: Array<string>): Observable<Response> {
+
     const url = this.proxy + "https://mobile.postsrvs.ru/mobile/orders";
     let data = {
       'uuid': this.device.uuid,
@@ -90,7 +111,7 @@ export class SysService {
   }
 
   //Отправка данных о нерабочих днях и причинах
-  public stopWork(dates) {
+  public stopWork(dates: Array<any>) {
     const url = this.proxy + "https://mobile.postsrvs.ru/sheduleData.php";
     let data = {
       "type": "stopWork",
@@ -111,7 +132,7 @@ export class SysService {
   //Возвращает сигнатуру, кодированную ключем яндекс.навигатора
   //@lat - широта
   //@lon - долгота
-  public getYandexnaviSignature(lat: number, lon: number): Observable<Response> {
+  public getYandexnaviSignature(lat: string, lon: string): Observable<Response> {
     const url = `${this.proxy}https://areg-p.flexcore.ru/admin/accessKeySignature/index.php?LAT=${lat}&LON=${lon}`;
     return this.http.get<Response>(url);
 
@@ -120,7 +141,7 @@ export class SysService {
   //Проверка на авторизованность
   //@appVersion - версия приложения
   public checkAuth(appVersion = '') {
-    const url = `${this.proxy}https://postsrvs.ru/mobile/orders`;
+    const url = `${this.proxy}https://mobile.postsrvs.ru/mobile/orders`;
     let data = {
       "action": "checkAuth",
       "uuid": this.device.uuid,
@@ -138,4 +159,14 @@ export class SysService {
     return this.http.post(url, data, httpOptions)
   }
 
+  public checkPhoto() {
+    const options: CameraOptions = {
+      quality: 25,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE
+    }
+    return this.camera.getPicture(options)
+
+  }
 }

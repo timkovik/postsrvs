@@ -1,72 +1,76 @@
-import { Observable } from "rxjs";
-import { MapService } from "./../../services/sys/map.service";
-import { Response } from "./../../interfaces/response";
-import { SysService } from "./../../services/sys.service";
-import { CourierService } from "./../../services/courier.service";
-import { SettingsService } from "./../../services/settings.service";
 import {
   Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  OnChanges,
+  OnInit
 } from "@angular/core";
-import { StateService } from "../../services/state.service";
-import { Platform, NavController } from "@ionic/angular";
-import {
-  GoogleMaps,
-  LatLng,
-  GoogleMapOptions,
-  GoogleMap,
-  LocationService,
-  MyLocation,
-  Marker,
-  MarkerClusterOptions,
-  MarkerOptions,
-  HtmlInfoWindow,
-  GoogleMapsAnimation,
-  MarkerCluster,
-  MarkerLabel,
-  MarkerClusterIcon,
-  CameraPosition,
-  GoogleMapsEvent,
-  BaseArrayClass,
-} from "@ionic-native/google-maps";
 import { Router } from "@angular/router";
-import { filter } from "rxjs/operators";
-import { AuthService } from "../../services/auth.service";
-import { AppVersion } from "@ionic-native/app-version/ngx";
-import { NavService } from "../../services/nav.service";
-import { takeUntil } from "rxjs/operators";
-import { Subject } from "rxjs";
-import { PopoverController } from "@ionic/angular";
+import {
+  DirectionsRenderer,
+  DirectionsResult,
+  DirectionsService,
+  GoogleMap,
+  GoogleMapOptions, GoogleMaps,
+  GoogleMapsEvent,
+  ILatLng,
+  ILatLngBounds,
+  LocationService,
+  Marker,
+  MarkerCluster,
+  MarkerOptions,
+  MyLocation
+} from "@ionic-native/google-maps/ngx";
+import { NavController, Platform, PopoverController } from "@ionic/angular";
+import { Storage } from "@ionic/storage";
+import { Observable, Subject } from "rxjs";
+import { filter, takeUntil } from "rxjs/operators";
+import { Order } from 'src/app/interfaces/order';
 import { OrderComponent } from "../../components/order/order.component";
+import { Meta } from '../../interfaces/meta';
+import { AuthService } from "../../services/auth.service";
+import { NavService } from "../../services/nav.service";
+import { StateService } from "../../services/state.service";
+import { DataService } from "../../services/sys/data.service";
+import { Response } from "./../../interfaces/response";
+import { CourierService } from "./../../services/courier.service";
+import { SettingsService } from "./../../services/settings.service";
+import { SysService } from "./../../services/sys.service";
+import { MapService } from "./../../services/sys/map.service";
+
+declare var AppVersion: { version: string };
 @Component({
   selector: "app-map",
   templateUrl: "./map.page.html",
   styleUrls: ["./map.page.scss"],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapPage implements OnInit {
   map: GoogleMap;
-  orders: Array<any> | null;
+  orders: Array<Order> | null;
   coords: { lt: number; lg: number };
   userId: string = localStorage.user;
   public isMapPreparing: boolean = false;
-  version: string;
   myLocation: MyLocation;
   public out_process: boolean = false;
   public out_counter = 0;
   public local_stop$: Subject<any> = new Subject();
   markers: Array<MarkerOptions>;
-  icons = [];
-  data = [];
-  existsGeos = [];
+  existsGeos: Array<number>[] = [];
   sliderOptions = {
     navigation: {
       nextEl: ".swiper-button-next",
       prevEl: ".swiper-button-prev",
     },
   };
+  renderer: DirectionsRenderer = null;
+  private origin: ILatLng = {
+    lat: 55.755826,
+    lng: 37.6173,
+  };
+  bounds: ILatLngBounds;
+  public routeToOrder = false;
+  public destination: ILatLng;
+  public currentOrder = '';
+
+
   constructor(
     public state$: StateService,
     public platform: Platform,
@@ -76,15 +80,12 @@ export class MapPage implements OnInit {
     private sys: SysService,
     private sysMap: MapService,
     private auth: AuthService,
-    private appVersion: AppVersion,
     private nav: NavService,
-    public googleMaps: GoogleMaps,
     public navCtrl: NavController,
-    public popoverController: PopoverController
+    public popoverController: PopoverController,
+    private data: DataService,
+    private storage: Storage
   ) {
-    this.courier.ordersShortData.subscribe((data: Array<any>) => {
-      this.orders = data;
-    });
   }
 
   ngOnInit() {
@@ -101,6 +102,7 @@ export class MapPage implements OnInit {
                 this.orders.length = 1;
               }
               console.log("sys:: заказы", this.orders);
+              this.orders && this.data.orders.next(this.orders);
               this.drawData(this.settings.rules.autoStartRoute);
             });
           });
@@ -110,10 +112,23 @@ export class MapPage implements OnInit {
         this.initContent();
       }
     });
-    this.sysMap.infoUpdated.subscribe(() => {
-      this.map.clear();
-      this.drawData();
+    this.sysMap.infoUpdated.subscribe((data: Meta) => {
+      let customData: any;
+      if (data) {
+        if (data.label == 'showRouteToOrder') {
+          this.routeToOrder = true;
+          this.currentOrder = String(data.order.client_id);
+          customData = data;
+        } else if (data.label == 'localChanges') {
+          customData = data
+        }
+      }
+
+      this.map.clear().then(() => {
+        this.drawData(this.settings.rules.autoStartRoute, customData);
+      });
     });
+
   }
 
   ngOnDestroy() {
@@ -124,9 +139,6 @@ export class MapPage implements OnInit {
     console.log("sys:: map view init");
     this.loadMap();
     this.platform.ready().then(() => {
-      this.appVersion.getVersionNumber().then((resp) => {
-        this.version = resp;
-      });
       this.initContent();
       LocationService.getMyLocation().then((myLocation: MyLocation) => {
         this.coords = { lt: myLocation.latLng.lat, lg: myLocation.latLng.lng };
@@ -149,9 +161,9 @@ export class MapPage implements OnInit {
       preferences: {
         building: false,
         clickableIcons: true,
-        padding: {
-          bottom: 10,
-        },
+        // padding: {
+        //   bottom: 10,
+        // },
       },
       controls: {
         myLocation: true,
@@ -161,10 +173,7 @@ export class MapPage implements OnInit {
         indoorPicker: true,
       },
       camera: {
-        target: {
-          lat: 55.755826,
-          lng: 37.6173,
-        },
+        target: this.origin,
         zoom: 10,
       },
       gestures: {
@@ -172,7 +181,7 @@ export class MapPage implements OnInit {
       },
     };
     this.map = await this.sysMap.attachMap("map", options);
-    this.sys.checkAuth(this.version).subscribe((res: Response) => {
+    this.sys.checkAuth(AppVersion.version).subscribe((res: Response) => {
       if (res.success == "false") {
         this.logout();
       }
@@ -201,7 +210,7 @@ export class MapPage implements OnInit {
   private getOrdersId(): Observable<any> {
     return new Observable((ids) => {
       if (this.settings.rules.typeRoute == "standart") {
-        this.orders && ids.next(this.orders.map((order) => order.id));
+        this.orders && ids.next(this.orders.filter(order => order.status_id == 1).map((order) => order.id));
       } else {
         this.sysMap.getWay(this.coords).subscribe((resp: Response) => {
           ids.next(resp.orders.map((order) => order.id));
@@ -212,30 +221,43 @@ export class MapPage implements OnInit {
 
   //Подготовка массива заказов к отрисовке в виду не рабочести markerCluster
   markeredOrders(orders: Array<any>) {
-    let markeredOrders = [];
-    orders.forEach((order) => {
+    let markeredOrders: MarkerOptions[] = [];
+    orders?.forEach((order: Order) => {
       let info = this.createInfoContent(order);
-      this.existsGeos.push([order.lt, order.lg]);
+      this.existsGeos.push([Number(order.lt), Number(order.lg)]);
       markeredOrders.push({
-        position: {
-          lat: order.lt,
-          lng: order.lg,
+        "position": {
+          "lat": parseFloat(order.lt),
+          "lng": parseFloat(order.lg),
         },
-        name: order.id,
-        info: info,
-        icon: "assets/markercluster/marker.png",
+        "name": order.id,
+        "info": info
+
       });
     });
     return markeredOrders;
   }
 
-  private drawData(autoStartRoute: string = "0") {
+  public drawData(autoStartRoute: string = "0", customData: any = null) {
     if (this.map !== undefined) {
-      if (autoStartRoute == "0") {
-        this.addCluster(this.markeredOrders(this.orders));
-        return false;
-      }
-    } else {
+      this.map.clear().then(() => {
+        if (this.routeToOrder && customData.label == 'showRouteTooOrder') {
+          this.requestDirection(customData.order.lt, customData.order.lg);
+          this.addCluster(this.markeredOrders([customData.order]));
+        } else {
+          this.routeToOrder = false;
+          if (autoStartRoute == "0") {
+            this.storage.get('orders').then((orders) => {
+              if (orders !== null) {
+                this.orders = orders.filter((order: Order) => { return order.status_id == 1 });
+                this.addCluster(this.markeredOrders(this.orders));
+              }
+
+            })
+          }
+        }
+      });
+
     }
   }
 
@@ -260,6 +282,13 @@ export class MapPage implements OnInit {
   public logout() {
     this.map.clear();
     localStorage.clear();
+    this.storage.clear().then(() => {
+      console.log('sys:: Сторож очищен');
+      this.storage.keys().then((keys) => console.log('записи в стораже: ', keys));
+    });
+    this.data.ordersMap.clear();
+
+
     const url = "orders";
     const data = { action: "logout" };
 
@@ -272,11 +301,11 @@ export class MapPage implements OnInit {
   }
 
   initContent() {
-    this.sys.checkAuth(this.version).subscribe((res: any) => {
+    this.sys.checkAuth(AppVersion.version).subscribe((res: Response) => {
       if (res.sync_id !== undefined) {
-        this.settings.getSettings(res.sync_id);
-        this.auth.setUser(res.sync_id);
-        this.courier.getBalance(res.sync_id, 1).subscribe((data: any) => {
+        this.settings.getSettings(res.sync_id as string);
+        this.auth.setUser(res.sync_id as string);
+        this.courier.getBalance(res.sync_id as number, 1).subscribe((data: any) => {
           this.courier.ordersInfo = data.res_more;
           this.courier.count_orders(data.res_more);
           this.orders = data.res_more;
@@ -285,6 +314,13 @@ export class MapPage implements OnInit {
             .pipe(filter((ids) => ids.length > 0))
             .subscribe((ids: Array<any>) => {
               this.getOrders(ids).subscribe((res: Response) => {
+                this.storage.get('orders').then((orders) => {
+                  if (orders == null) {
+                    this.data.getApiData()
+                  } else {
+                    this.data.orders.next(orders)
+                  }
+                })
                 this.orders = res.orders;
                 if (
                   this.settings.rules.appMode.toLowerCase().includes("auto")
@@ -300,8 +336,8 @@ export class MapPage implements OnInit {
     });
   }
 
-  addCluster(markeredOrders) {
-    let markerCluster: MarkerCluster = this.map.addMarkerClusterSync({
+  addCluster(markeredOrders: MarkerOptions[]) {
+    const options = {
       maxZoomLevel: 14,
       markers: markeredOrders,
       boundsDraw: false,
@@ -317,42 +353,24 @@ export class MapPage implements OnInit {
           anchor: { x: 16, y: 16 },
         },
       ],
-    });
-    markerCluster.on(GoogleMapsEvent.MARKER_CLICK).subscribe((params) => {
+    };
+    let markerCluster: MarkerCluster = this.map.addMarkerClusterSync(options);
+    console.log(`sys:: MarkerCluster added: `, markerCluster);
+    markerCluster.on(GoogleMapsEvent.MARKER_CLICK).subscribe(async (params) => {
       let marker: Marker = params[1];
-      let htmlInfoWindow = new HtmlInfoWindow();
-      marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
-        htmlInfoWindow.setContent(marker.get("info"), {
-          background: "transparent",
-          "border-radius": "4px",
-          width: "300px",
-          "max-height": "250px",
-        });
-        htmlInfoWindow.on(GoogleMapsEvent.INFO_CLOSE).subscribe(() => {
-          htmlInfoWindow.off(GoogleMapsEvent.INFO_CLOSE);
-          console.log("sys:: htmlinfowindow.ONclose ", htmlInfoWindow);
-          htmlInfoWindow.open(marker);
-          htmlInfoWindow.setContent("");
+      let popover = await this.popover(GoogleMapsEvent.MARKER_CLICK, marker.get('info'));
+      popover.present();
+    })
 
-          htmlInfoWindow.one("content_changed").then(() => {
-            if (htmlInfoWindow.get("content") == "") {
-              htmlInfoWindow.close();
-            }
-          });
-        });
-
-        htmlInfoWindow.open(marker);
-      });
-    });
   }
 
-  createInfoContent(order) {
+  createInfoContent(order: Order) {
     let sameGeoOrders: Array<any> = this.orders.filter(
       (iOrder) => iOrder.lt == order.lt && iOrder.lg == order.lg
     );
     let tabsContent = "";
-    let note = localStorage.getItem(order.id)
-      ? localStorage.getItem(order.id)
+    let note = localStorage.getItem(String(order.id))
+      ? localStorage.getItem(String(order.id))
       : "";
     let from = order.datetime_from || "";
     let arrows =
@@ -366,21 +384,16 @@ export class MapPage implements OnInit {
       <div style='width: 100%;text-align: start;margin: 0 30px;'>
 <span class='order-id'>${order.client_id}</span>
 <hr style="background: #D6CFCF;"/>
-<span class='prop'>Дата доставки: c</span>  <span class='val'>${
-        order.datetime_from?.slice(11, 16) || ""
-      }</span> <span class='prop'>До:</span> <span class='val'> ${
-        order.datetime_to ? order.datetime_to?.slice(11, 16) : ""
-      } </span>
-<br/><span class='prop'>Имя:</span>  <span class='val'>${
-        order.client_fio
-      }</span>
-<br/><span class='prop'>Компания:</span><span class='val'> ${
-        order.client_name
-      }</span>
+<span class='prop'>Дата доставки: c</span>  <span class='val'>${order.datetime_from?.slice(11, 16) || ""
+        }</span> <span class='prop'>До:</span> <span class='val'> ${order.datetime_to ? order.datetime_to?.slice(11, 16) : ""
+        } </span>
+<br/><span class='prop'>Имя:</span>  <span class='val'>${order.client_fio
+        }</span>
+<br/><span class='prop'>Компания:</span><span class='val'> ${order.client_name
+        }</span>
 <br/>
-<button onClick='localStorage.setItem("needOrder",${
-        order.id
-      })' style='margin-top: 10px; width: 100%;;padding:10px;background: #2E627E;
+<button onClick='localStorage.setItem("needOrder",${order.id
+        })' style='margin-top: 10px; width: 100%;;padding:10px;background: #2E627E;
 border-radius: 4px; color:white;font-weight: 500;
 font-size: 12px;
 line-height: 14px;'>Детали</button>${note}
@@ -440,13 +453,73 @@ ${arrows}
     return frame;
   }
 
-  async presentPopover(ev: any) {
+  async popover(ev: any, content: any) {
+    content = content.innerHTML;
     const popover = await this.popoverController.create({
       component: OrderComponent,
-      cssClass: "my-custom-class",
       event: ev,
       translucent: true,
+      componentProps: {
+        'content': content
+      },
+      cssClass: 'popover'
     });
-    return await popover.present();
+    return popover
   }
+
+  private requestDirection(lat: number, lng: number) {
+    this.destination = { lat, lng };
+
+    DirectionsService.route({
+      'origin': this.origin,
+      'destination': this.destination,
+      'travelMode': "DRIVING"
+    }).then((result: DirectionsResult) => {
+      console.log(JSON.stringify(result, null, 2));
+      this.bounds = result.routes[0].bounds;
+      if (!this.renderer) {
+        this.renderer = this.map.addDirectionsRendererSync({
+          'directions': result,
+          'panel': 'guide',
+          'polylineOptions': {
+            'points':
+              [
+                this.origin,
+                this.destination
+              ]
+          },
+          'markerOptions': {
+            visible: false
+          }
+        });
+        this.renderer.on(GoogleMapsEvent.DIRECTIONS_CHANGED).subscribe(this.onDirectionChanged.bind(this));
+      } else {
+        let decodedPoints = GoogleMaps.getPlugin().geometry.encoding.decodePath(
+          result.routes[0].overview_polyline
+        );
+        this.map.addPolyline({
+          points: decodedPoints,
+          'color': '#4a4a4a',
+          width: 4,
+          geodesic: false
+        });
+        this.map.addMarkerSync({ position: this.destination });
+        this.renderer.setDirections(result);
+      }
+    });
+  }
+  onDirectionChanged() {
+    let directions: DirectionsResult = this.renderer.getDirections();
+    this.origin = directions.routes[0].legs[0].start_location;
+    this.destination = directions.routes[0].legs[0].end_location;
+    this.bounds = directions.routes[0].bounds;
+  }
+  onSplitterDragEnd() {
+    this.map.animateCamera({
+      'target': this.bounds,
+      'duration': 500
+    });
+
+  }
+
 }

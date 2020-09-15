@@ -6,7 +6,6 @@ import { AuthService } from '../services/auth.service';
 import { NavService } from '../services/nav.service';
 import { StateService } from '../services/state.service';
 import { Platform } from '@ionic/angular';
-import { AppVersion } from '@ionic-native/app-version/ngx';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +23,6 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot) {
     let url = next.routeConfig.path;
-
     switch (url) {
       case 'courier':
         this.nav_s.tabNav.next(3);
@@ -40,9 +38,6 @@ export class AuthGuard implements CanActivate {
         this.nav_s.tabNav.next(0);
         let authState = this.state.g_state.getValue();
         console.log('sys:: состояние аутентификации: ', authState);
-        // if (authState == 'login') {
-        //   return false;
-        // }
         break;
       default:
         break;

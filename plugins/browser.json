@@ -16,9 +16,6 @@
     "cordova-plugin-device": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
-    "cordova-plugin-splashscreen": {
-      "PACKAGE_NAME": "io.cordova.hellocordova"
-    },
     "cordova-plugin-ionic-webview": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
@@ -32,9 +29,6 @@
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
     "com-darryncampbell-cordova-plugin-intent": {
-      "PACKAGE_NAME": "io.cordova.hellocordova"
-    },
-    "cordova-plugin-inappbrowser": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
     "call-number": {
@@ -52,25 +46,34 @@
     "cordova-plugin-screen-orientation": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
-    "cordova-plugin-app-version": {
-      "PACKAGE_NAME": "io.cordova.hellocordova"
-    },
-    "cordova-plugin-androidx": {
-      "PACKAGE_NAME": "io.cordova.hellocordova"
-    },
     "cordova.plugins.diagnostic": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
     "phonegap-plugin-barcodescanner": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
+    "cordova-sqlite-storage": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-splashscreen": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-appversion": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
     "com.googlemaps.ios": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-androidx-adapter": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
     "cordova-plugin-googlemaps": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
-    "cordova-plugin-androidx-adapter": {
+    "cordova-plugin-firebasex": {
+      "FIREBASE_ANALYTICS_COLLECTION_ENABLED": "true",
+      "FIREBASE_PERFORMANCE_COLLECTION_ENABLED": "true",
+      "FIREBASE_CRASHLYTICS_COLLECTION_ENABLED": "true",
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
     "cordova-plugin-ionic": {
@@ -83,5 +86,9 @@
       "PACKAGE_NAME": "io.cordova.hellocordova"
     }
   },
-  "dependent_plugins": {}
+  "dependent_plugins": {
+    "cordova-plugin-androidx": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    }
+  }
 }

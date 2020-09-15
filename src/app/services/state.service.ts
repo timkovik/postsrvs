@@ -1,10 +1,11 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject, Observable, interval, BehaviorSubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { WebIntent } from '@ionic-native/web-intent/ngx';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { SysService } from './sys.service';
+import { BehaviorSubject, interval, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Order } from '../interfaces/order';
 import { Response } from '../interfaces/response';
+import { SysService } from './sys.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,9 +40,7 @@ export class StateService {
 
   public position: BehaviorSubject<any> = new BehaviorSubject(null);
   public points: BehaviorSubject<any> = new BehaviorSubject(null);
-  public l_route;
-  public l_map;
-  public duration;
+  public l_route: unknown | null;
   public map_state: BehaviorSubject<any> = new BehaviorSubject(null);
   public route_state: BehaviorSubject<any> = new BehaviorSubject('not_init');
   public change_state: BehaviorSubject<any> = new BehaviorSubject('not_init');
@@ -54,7 +53,6 @@ export class StateService {
   public linkPoints: BehaviorSubject<any> = new BehaviorSubject('not_init');
   public link_init: boolean = false;
   public map_state_watch: boolean = false;
-  public link;
   public disLink: boolean = true;
 
   //COURIER
@@ -96,11 +94,8 @@ export class StateService {
   //обновляем все данные с сервера
   public updateWayInfo: Subject<any> = new Subject();
   // DATA
-  public orders_data = null;
-  public statuses_data = null;
-  //NOTIFICATIONS
-  public notifications = [];
-  public notificationStr = null;
+  public orders_data: Order[] = null;
+  public statuses_data: unknown = null;
   public coords: any;
   public filial: string = '';
   public orderCoordinates(): Observable<any> {
@@ -130,28 +125,6 @@ export class StateService {
     });
   }
 
-  public setNotification(tag: string, mes: string) {
-    this.notifications[tag] = mes;
-    this.setNotificationStr();
-  }
-
-  public unsetNotification(tag: string) {
-    delete (this.notifications[tag]);
-    this.setNotificationStr();
-  }
-
-  public getNotification(tag: string): string {
-    return this.notifications[tag];
-  }
-
-  private setNotificationStr() {
-    let n_s = "";
-    for (let tag in this.notifications) {
-      n_s += this.notifications[tag];
-    }
-    this.notificationStr = n_s;
-  }
-
   //при выходе возвращаем приложение в иходное состояние
   public logout() {
     this.stop$.next();
@@ -159,8 +132,6 @@ export class StateService {
     this.position.next(null);
     this.points.next(null);
     this.l_route = null;
-    this.l_map = null;
-    this.duration = null;
     this.map_state.next(null);
     this.route_state.next('not_init');
     this.change_state.next('not_init');
@@ -195,7 +166,7 @@ export class StateService {
   }
 
   //Открыть маршрут в навигаторе
-  public intentStart(coordinates) {
+  public intentStart(coordinates: string[]) {
     console.log('sys:: coordinates', coordinates);
     const options = {
       action: this.wi.ACTION_VIEW,
@@ -212,7 +183,7 @@ export class StateService {
   }
 
   //adress - строка с адресом
-  getCoordinates(adress) {
+  getCoordinates(adress: string) {
 
     return this.http.get('https://geocode-maps.yandex.ru/1.x/?apikey=4949ca72-35d9-48b0-892d-72d307850c87&format=json&geocode=' + adress)
 

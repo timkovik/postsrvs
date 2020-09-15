@@ -1,0 +1,80 @@
+.schedule-area {
+  min-height: 50%;
+  padding-top: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.working {
+  background: rgba(13, 182, 20, 0.05);
+  border-bottom: 1px solid #686868;
+  padding-top: 30px;
+}
+
+.non-working {
+  background: rgba(255, 0, 77, 0.05);
+}
+
+.descr {
+  font-size: 14px;
+  line-height: 16px;
+  color: #686868;
+}
+
+ion-item {
+  margin-top: 20px;
+  width: 80%;
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-top: 3px;
+  --inner-padding-bottom: 3px;
+}
+
+ion-datetime {
+  border: 1px solid #686868;
+  box-sizing: border-box;
+  border-radius: 4px;
+  margin-right: 25px;
+  background: white;
+  width: -webkit-fill-available;
+}
+
+ion-button {
+  --background: #2b637e;
+}
+
+.confirm {
+  height: 100%;
+}
+
+ion-list.md {
+  background: transparent;
+}
+
+ion-list-header {
+  padding-left: 0;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 0;
+  font-size: 14px;
+  color: #686868;
+}
+ion-text.del {
+  margin-left: 60px;
+  font-size: 14px;
+  a {
+    text-decoration: underline;
+    color: #686868;
+  }
+}
+.working ul:nth-child(odd) {
+  background: rgba(13, 182, 20, 0.2);
+}
+ion-content {
+  bottom: 30px;
+}

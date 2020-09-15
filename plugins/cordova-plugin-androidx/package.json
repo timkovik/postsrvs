@@ -1,38 +1,45 @@
 {
-  "_from": "cordova-plugin-androidx@^1.0.2",
-  "_id": "cordova-plugin-androidx@1.0.2",
+  "_from": "cordova-plugin-androidx@^2.0.0",
+  "_id": "cordova-plugin-androidx@2.0.0",
   "_inBundle": false,
-  "_integrity": "sha512-gA0Ugz3xXRndZ5+QV+T2BjigNt5YraC+uDA/gOEM6p4m4ofwqFAPoHA4Q17VIHnRtn9++OYoa1Gi44+l6blGhA==",
+  "_integrity": "sha512-n5QA1LJ/wT9qpDCHAw2GwqVXVlEajRPnDH5CKZGpv90M1FYVMydYlFwCEbpp263e5I5QloPjyoyWagiKLB+JMg==",
   "_location": "/cordova-plugin-androidx",
   "_phantomChildren": {},
   "_requested": {
     "type": "range",
     "registry": true,
-    "raw": "cordova-plugin-androidx@^1.0.2",
+    "raw": "cordova-plugin-androidx@^2.0.0",
     "name": "cordova-plugin-androidx",
     "escapedName": "cordova-plugin-androidx",
-    "rawSpec": "^1.0.2",
+    "rawSpec": "^2.0.0",
     "saveSpec": null,
-    "fetchSpec": "^1.0.2"
+    "fetchSpec": "^2.0.0"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-androidx/-/cordova-plugin-androidx-1.0.2.tgz",
-  "_shasum": "a48d3fabf20beb4273171fdece0b524362b2643f",
-  "_spec": "cordova-plugin-androidx@^1.0.2",
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-androidx/-/cordova-plugin-androidx-2.0.0.tgz",
+  "_shasum": "ac7bd51ba0ae42dbfe4090a3cd4b8fac32f35ad1",
+  "_spec": "cordova-plugin-androidx@^2.0.0",
   "_where": "/Users/timkovik/Documents/Repositories/postsrvs",
   "author": {
     "name": "Dave Alden"
   },
-  "bundleDependencies": false,
-  "dependencies": {
-    "q": "^1.4.1"
+  "bugs": {
+    "url": "https://github.com/dpa99c/cordova-plugin-androidx/issues"
   },
+  "bundleDependencies": false,
+  "dependencies": {},
   "deprecated": false,
   "description": "Cordova/Phonegap plugin to enable AndroidX",
   "devDependencies": {},
+  "homepage": "https://github.com/dpa99c/cordova-plugin-androidx#readme",
   "license": "MIT",
   "name": "cordova-plugin-androidx",
-  "version": "1.0.2"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dpa99c/cordova-plugin-androidx.git"
+  },
+  "version": "2.0.0"
 }

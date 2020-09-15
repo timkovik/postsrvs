@@ -1,25 +1,25 @@
+import {
+  animate, state,
+  style,
+
+  transition, trigger
+} from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
-import { CourierService } from '../../services/courier.service';
-import { AuthService } from '../../services/auth.service';
-import { StateService } from '../../services/state.service';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { AlertController } from '@ionic/angular';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition
-} from '@angular/animations';
-
+import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { FirebaseX } from '@ionic-native/firebase-x/ngx';
+import { AlertController } from '@ionic/angular';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Response } from 'src/app/interfaces/response';
+import { AuthService } from '../../services/auth.service';
+import { CourierService } from '../../services/courier.service';
 import { SettingsService } from '../../services/settings.service';
+import { StateService } from '../../services/state.service';
 import { SysService } from '../../services/sys.service';
-import { WiredIconButton } from 'wired-elements';
 import { MapService } from './../../services/sys/map.service';
+
 
 @Component({
   selector: 'app-balance',
@@ -74,7 +74,7 @@ import { MapService } from './../../services/sys/map.service';
   ]
 })
 export class BalancePage implements OnInit {
-  public info = null;
+  public info: Response = null;
   public pageInit: boolean = false;
   public loader = true;
   public local_stop$: Subject<any> = new Subject();
@@ -87,13 +87,12 @@ export class BalancePage implements OnInit {
   public review_w: boolean = false;
   public failsOrder: boolean = false;
   public failsOrderNotFull: boolean = false;
-  public failOrdersCount: Number = 0;
-  public fo_comment: String = ""; //комментарий к частичной сдаче заказов
+  public failOrdersCount: number = 0;
+  public fo_comment: string = ""; //комментарий к частичной сдаче заказов
   public schedule = Boolean(this.settings.rules.schedule);
   public isShowSchedule: boolean = false;
   public isGoToWork: boolean = false;
   public isStopWork: boolean = false;
-  public workDates: Array<any> = [];
   public nonWorkDates: Array<any> = [];
   public notWorkRules = {};
 
@@ -106,7 +105,8 @@ export class BalancePage implements OnInit {
     private AP: AndroidPermissions,
     public settings: SettingsService,
     public sys: SysService,
-    private sysMap: MapService
+    private sysMap: MapService,
+    private firebase: FirebaseX
   ) {
     this.AP.requestPermission(this.AP.PERMISSION.ACCESS_FINE_LOCATION);
     if (this.info == null) {
@@ -130,7 +130,8 @@ export class BalancePage implements OnInit {
 
   ngOnInit() {
     this.schedule = Boolean(this.settings.rules.schedule);
-    this.courier.getBalance(this.auth.userId, 1).subscribe((data: any) => {
+    this.courier.getBalance(Number(this.auth.userId), 1).subscribe((data: any) => {
+      this.firebase.setUserProperty('courier', data.name);
       this.courier.ordersInfo = data.res_more;
       this.courier.count_orders(data.res_more);
       this.courier.ordersShortData.next(data.res_more);
@@ -153,7 +154,7 @@ export class BalancePage implements OnInit {
     })
   }
 
-  public getInfo(sync_id) {
+  public getInfo(sync_id: number) {
     var self = this;
 
     this.courier.getBalance(sync_id).subscribe((data: any) => {
@@ -175,11 +176,11 @@ export class BalancePage implements OnInit {
     console.log('sys::cashOut() !openBtn && !failsOrder', !this.openBtn && !this.failsOrder);
   }
 
-  public sendCash(photo) {
+  public sendCash(photo: string) {
     this.loader = true;
 
     const url = 'orders';
-    let data = { 'action': 'cashout', 'sum': this.info.sumNal, 'image': photo };
+    let data = { 'action': 'cashout', 'sum': this.info.sumNal, 'image': photo, 'isFull': '', 'ordersCount': 0, 'comment': '', 'ordersComment': '' };
 
     if (this.commentText != '' && this.commentText) {
       data['isFull'] = '0';
@@ -241,7 +242,7 @@ export class BalancePage implements OnInit {
     });
   }
 
-  public async cashoutResult(result) {
+  public async cashoutResult(result: boolean) {
 
     if (result) {
       const alert = await this.alert.create({
@@ -264,7 +265,7 @@ export class BalancePage implements OnInit {
     }
   }
 
-  public answer(isFull) {
+  public answer(isFull: boolean) {
     console.log('sys:: answer');
     if (!isFull && (!this.commentText || this.commentText == '')) {
       this.commentError = true;
@@ -284,7 +285,7 @@ export class BalancePage implements OnInit {
     }
   }
 
-  public fo_answer(flag) {
+  public fo_answer(flag: boolean) {
 
     if (!this.failsOrderNotFull) {
       if (flag) {
@@ -316,7 +317,7 @@ export class BalancePage implements OnInit {
   }
 
 
-  public sendReview(text) {
+  public sendReview(text: String) {
     this.loader = true;
     let url = 'orders';
     let data = {
@@ -338,57 +339,11 @@ export class BalancePage implements OnInit {
   public navToSettings() {
     this.sysMap.navigate(['/about']);
   }
-  public check_to_work() {
-
-  }
 
   public showSchedule() {
     this.router.navigate(['schedule']);
   }
-  public goToWork() {
-    this.sys.goToWork(this.workDates).subscribe((data: { success: boolean }) => {
-      console.log('sys:: gotoWork resp', data);
-      if (data.success) {
-        this.sys.presentToast('Рабочие часы записаны', 'success');
-        this.isGoToWork = false;
-      }
 
-    });
-  }
-
-  public showWorkScheduler() {
-    this.isGoToWork = true;
-  }
-  public stopWork() {
-    this.sys.stopWork(this.nonWorkDates).subscribe((data: { success: boolean }) => {
-      console.log('sys:: stopWork resp', data);
-      if (data.success) {
-        this.sys.presentToast('Нерабочие дни записаны', 'success');
-        this.isStopWork = false;
-      }
-
-    });
-  }
-
-  public addWorkDate(workDate) {
-    workDate = workDate.el.value.replace('T', ' ').substr('', 19);
-    this.workDates.push(workDate);
-  }
-
-  public showStopWorkScheduler() {
-    this.isStopWork = true;
-    this.sys.getNotWorkRules().subscribe((data) => {
-      this.notWorkRules = data;
-    })
-  }
-
-  public addNonWorkDate(date) {
-    let dateObj = {
-      date: date.value.substr('', 10),
-      reason: 0
-    }
-    this.nonWorkDates.push(dateObj)
-  }
   navToMap() {
     this.router.navigate(['map'])
   }

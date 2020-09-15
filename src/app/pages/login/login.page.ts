@@ -1,25 +1,23 @@
-import { Component, OnInit, HostBinding } from '@angular/core';
-import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
-import { Platform } from '@ionic/angular';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from '../../services/auth.service';
-import { StateService } from '../../services/state.service';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { CourierService } from '../../services/courier.service';
-import { AppVersion } from '@ionic-native/app-version/ngx';
 import {
-  trigger,
-  state,
+  animate, state,
   style,
-  animate,
-  transition,
+
+  transition, trigger
 } from '@angular/animations';
-import { takeUntil } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { AlertController, Platform } from '@ionic/angular';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { MapService } from 'src/app/services/sys/map.service';
+import { AuthService } from '../../services/auth.service';
+import { CourierService } from '../../services/courier.service';
 import { SettingsService } from '../../services/settings.service';
+import { StateService } from '../../services/state.service';
 import { SysService } from '../../services/sys.service';
-import { WiredButton, WiredInput, WiredSpinner } from "wired-elements";
+declare var AppVersion: { version: string, build: number };
 
 @Component({
   selector: 'app-login',
@@ -66,11 +64,10 @@ export class LoginPage implements OnInit {
   public phone = '';
   public loader: boolean = false;
   public auth_step: boolean = false;
-  public code = null;
+  public code: string = null;
   public resend_dis: boolean = false;
-  public dis_timer = null;
+  public dis_timer: number = null;
   public $stopTimer: Subject<any> = new Subject();
-
   constructor(private auth: AuthService,
     private router: Router,
     private alert: AlertController,
@@ -79,9 +76,9 @@ export class LoginPage implements OnInit {
     public state$: StateService,
     private AP: AndroidPermissions,
     public courier: CourierService,
-    private appVersion: AppVersion,
     public settings: SettingsService,
-    public sys: SysService
+    public sys: SysService,
+    public sysMap: MapService
   ) {
     let self = this;
 
@@ -92,17 +89,15 @@ export class LoginPage implements OnInit {
       if (readySource == 'android') {
         this.AP.requestPermission(this.AP.PERMISSION.ACCESS_FINE_LOCATION);
       }
-      self.appVersion.getVersionNumber().then((resp) => {
-        this.auth.version = resp;
-        this.auth.checkAuth().subscribe((data: any) => {
-          if (data.success == 'true') {
-            this.auth.setUser(data.sync_id);
-            this.settings.getSettings(data.sync_id);
-            self.router.navigate(['map']);
-            self.auth.initLogin();
-          } else {
-          }
-        })
+      this.auth.version = AppVersion.version;
+      this.auth.checkAuth().subscribe((data: any) => {
+        if (data.success == 'true') {
+          this.auth.setUser(data.sync_id);
+          this.settings.getSettings(data.sync_id);
+          self.router.navigate(['map']);
+          self.auth.initLogin();
+        } else {
+        }
       })
 
     })
@@ -185,7 +180,6 @@ export class LoginPage implements OnInit {
     const data = "action=registerP&phone=8" + this.phone + "&type=courier";
     var self = this;
     this.sendPost(url, data).subscribe((res: any) => {
-      this.state$.unsetNotification('internet');
       if (res.success == 'true') {
         self.authStep();
       } else {
@@ -197,7 +191,7 @@ export class LoginPage implements OnInit {
     this.startTimer();
   }
 
-  public sendPost(url, data) {
+  public sendPost(url: string, data: any) {
     console.log('send_data', data);
     const httpOptions = {
       headers: new HttpHeaders({
@@ -231,7 +225,7 @@ export class LoginPage implements OnInit {
     })
   }
 
-  public login(courier) {
+  public login(courier: string) {
     let base = "33dbcda2db5311e39760309e88d17f08," + courier;
     localStorage.setItem('cId', courier);
     var self = this;
@@ -253,7 +247,7 @@ export class LoginPage implements OnInit {
     });
   }
 
-  public showLoginError(err_n) {
+  public showLoginError(err_n: number) {
     switch (err_n) {
       case 3:
         this.loader = false;

@@ -1,41 +1,39 @@
-import { Injectable, Directive } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { StateService } from '../services/state.service';
-import { forkJoin, interval, BehaviorSubject, Subject, Observable } from 'rxjs';
-import { takeUntil, merge, take } from 'rxjs/operators';
-import { Platform } from '@ionic/angular';
+import { Directive, Injectable } from '@angular/core';
+import { FirebaseX } from '@ionic-native/firebase-x/ngx';
+import { CacheService } from "ionic-cache";
+import { from, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Order } from '../interfaces/order';
+import { Response } from '../interfaces/response';
 import { AuthService } from '../services/auth.service';
-import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
-import { OrderPage } from '../pages/order/order.page';
-import { SettingsService } from './settings.service';
+import { StateService } from '../services/state.service';
 import { SysService } from '../services/sys.service';
-
+import { SettingsService } from './settings.service';
 declare var ymaps: any;
 @Directive()
 @Injectable({
   providedIn: 'root'
 })
 export class CourierService {
-  barcodeScannerOptions: BarcodeScannerOptions;
-  public ordersInfo: any;
+  public ordersInfo: Array<any> = [];
   public ordersShortData: Subject<any> = new Subject();
   public checkedOnWork: boolean = true;
-  public sortOrders;
+  public sortOrders = {
+    "g_done": 0,
+    "g_process": 0,
+    "g_fail": 0,
+    "all": 0
+  };
 
   constructor(private http: HttpClient,
-    private router: Router,
-    private plt: Platform,
     private state$: StateService,
     private auth: AuthService,
-    private bs: BarcodeScanner,
     private settings: SettingsService,
-    public sys: SysService
+    public sys: SysService,
+    private cache: CacheService,
+    private firebase: FirebaseX
   ) {
-    this.barcodeScannerOptions = {
-      showTorchButton: true,
-      showFlipCameraButton: true
-    };
     //при выходе из приложения возвращаем начальное состояние
     var self = this;
     this.state$.interval_1ss.pipe(takeUntil(this.state$.stop$)).subscribe(() => {
@@ -74,15 +72,11 @@ export class CourierService {
   /**
    * Меняем на серере режим маршрута
    */
-  public changeRouteMode(mode) {
+  public changeRouteMode(mode: string) {
     if (this.state$.way.getValue() !== null) {
       let url = 'orders';
       const routeId = this.state$.way.getValue()[0].route;
-
-
-
-      let data = { 'action': 'changeRouteMode', 'routeId': this.state$.way.getValue()[0].route };
-
+      let data = { 'action': 'changeRouteMode', 'routeId': this.state$.way.getValue()[0].route, 'mode': '' };
       if (mode == 'auto' || mode == 'fullHand') {
         data['mode'] = mode;
       } else {
@@ -149,7 +143,7 @@ export class CourierService {
 
             break;
           case 'way_init':
-            self.getOrders().subscribe((data: any) => {
+            self.getOrders().subscribe((data: Response) => {
               console.log('sys:: Данные о заказах', data);
               if ((data.success == 'true') && (data.reason !== 'нет заказов')) {
                 self.state$.orders.next(data.orders);
@@ -163,7 +157,7 @@ export class CourierService {
                 });
               } else if (data.reason == 'empty' || data.reason == 'нет заказов') {
                 console.log('Массив данных о заказах пуст');
-                let rmpt = [];
+                let rmpt: [] = [];
                 self.state$.orders.next(rmpt);
                 self.state$.orders_data = rmpt;
                 self.state$.state.next('orders_init');
@@ -217,7 +211,8 @@ export class CourierService {
       'action': 'getWay',
       'lt': this.state$.position.getValue().lt,
       'lg': this.state$.position.getValue().lg,
-      'auto': mode
+      'auto': mode,
+      'mode': ''
     }
     let app_mode = this.auth.getMode();
     if ((app_mode == 'fullHand' || app_mode == 'hand') || this.state$.manual_route) {
@@ -235,7 +230,7 @@ export class CourierService {
         self.state$.state.next('way_init');
       } else if (orders.reason == 'empty') {
         self.state$.manual_route = false;
-        let emt = [];
+        let emt: [] = [];
         self.state$.way.next(emt);
         self.state$.state.next('way_init');
       }
@@ -283,23 +278,20 @@ export class CourierService {
   //@sync_id - ид курьера
   //@more - флаг необходимости доп данных (краткая инфа о заказах для листинга)
   //@CL - код филлиала
-  public getBalance(sync_id, more = 0) {
+  public getBalance(sync_id: number, more = 0) {
+    this.firebase.setUserId(String(sync_id));
     let CL = this.settings.get('cl');
     let url = this.sys.proxy + "https://terminal.vestovoy.ru/info/stat.php?cid=" + sync_id + '&more=' + more + '&CL=' + CL;
-
     return this.http.get(url);
   }
 
-  public getStatus(order) {
-
+  public getStatus(order: Order) {
     if (order.status_id == 1) {
       return 'Доставляется';
     } else {
-      var statuses = this.state$.statuses.getValue();
-
+      let statuses = this.state$.statuses.getValue();
       for (var i = 0; i < statuses.length; i++) {
-        var status = statuses[i];
-
+        let status = statuses[i];
         if (status.id == order.status_id) {
           return status.status;
         }
@@ -308,10 +300,10 @@ export class CourierService {
   }
 
 
-  public changeStatus(status = '', id = '', comment = '', reason = '', goods = '', payment = '', new_plan_date = '') {
-    var url = 'orders';
-    var draw = localStorage.getItem('drawImg');
-    var data = {
+  public changeStatus(status = '', id = '', comment = '', reason = '', goods = '', payment = '', new_plan_date = '', check = '', recognizedCheckData: string = null) {
+    let url = 'orders';
+    let draw = localStorage.getItem('drawImg');
+    let data = {
       'action': 'changedStatus',
       'status': status,
       'id': id,
@@ -319,11 +311,28 @@ export class CourierService {
       'reason': reason,
       'goods': goods,
       'payment': payment,
-      'new_plam_date': new_plan_date
+      'new_plam_date': new_plan_date,
+      'check': check,
+      'recognizedCheckData': recognizedCheckData,
+      'sign': ''
     };
     if (draw) data['sign'] = draw;
 
-    return this.auth.sendPost(url, data);
+    if (navigator.onLine) {
+      return this.auth.sendPost(url, data);
+    } else {
+      let requests: any = [];
+      this.cache.getItem('requests').then((req: any
+      ) => {
+        if (req !== undefined) {
+          requests = req;
+        }
+        requests.push({ url: url, data: data });
+        this.cache.saveItem('requests', requests);
+      });
+      return from([{ success: 'true' }])
+    }
+
   }
 
   public logout() {
@@ -338,7 +347,7 @@ export class CourierService {
    * если нет - false
    * @param code //штрих-код
    */
-  public findOrder(code) {
+  public findOrder(code: string) {
     const url = 'orders';
     let data = {
       'action': 'findOrder',
@@ -369,7 +378,7 @@ export class CourierService {
     return resp;
   }
 
-  public sumbitOrder(orderId) {
+  public sumbitOrder(orderId: string) {
     let url = 'orders';
     let data = {
       'action': 'submitOrder',
@@ -394,7 +403,7 @@ export class CourierService {
   }
 
   public check_to_work() {
-    let url = this.sys.proxy + 'https://postsrvs.ru/admin/ajax/check_to_work.php';
+    let url = this.sys.proxy + 'https://mobile.postsrvs.ru/admin/ajax/check_to_work.php';
     let data = {
       cId: this.auth.getUserId(),
       token: "l;sdfjkhglsoapl[",
@@ -412,7 +421,7 @@ export class CourierService {
     })
   }
 
-  public count_orders(orders) {
+  public count_orders(orders: Order[]) {
     let g_done = 0;
     let g_process = 0;
     let g_fail = 0;
@@ -448,7 +457,7 @@ export class CourierService {
 
   //Завершение рабочего дня курьера
   public endWork() {
-    const url = this.sys.proxy + 'https://postsrvs.ru/admin/ajax/end_work.php';
+    const url = this.sys.proxy + 'https://mobile.postsrvs.ru/admin/ajax/end_work.php';
     const headers = new HttpHeaders({
       'Access-Control-Allow-Origin': '*',
       'Content-type': 'application/json'

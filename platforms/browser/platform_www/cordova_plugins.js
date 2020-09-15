@@ -29,20 +29,6 @@ module.exports = [
         "runs": true
     },
     {
-        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
-        "id": "cordova-plugin-splashscreen.SplashScreen",
-        "pluginId": "cordova-plugin-splashscreen",
-        "clobbers": [
-            "navigator.splashscreen"
-        ]
-    },
-    {
-        "file": "plugins/cordova-plugin-splashscreen/src/browser/SplashScreenProxy.js",
-        "id": "cordova-plugin-splashscreen.SplashScreenProxy",
-        "pluginId": "cordova-plugin-splashscreen",
-        "runs": true
-    },
-    {
         "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
         "id": "cordova-plugin-ionic-webview.IonicWebView",
         "pluginId": "cordova-plugin-ionic-webview",
@@ -65,21 +51,6 @@ module.exports = [
         "clobbers": [
             "intentShim"
         ]
-    },
-    {
-        "file": "plugins/cordova-plugin-inappbrowser/www/inappbrowser.js",
-        "id": "cordova-plugin-inappbrowser.inappbrowser",
-        "pluginId": "cordova-plugin-inappbrowser",
-        "clobbers": [
-            "cordova.InAppBrowser.open",
-            "window.open"
-        ]
-    },
-    {
-        "file": "plugins/cordova-plugin-inappbrowser/src/browser/InAppBrowserProxy.js",
-        "id": "cordova-plugin-inappbrowser.InAppBrowserProxy",
-        "pluginId": "cordova-plugin-inappbrowser",
-        "runs": true
     },
     {
         "file": "plugins/call-number/www/CallNumber.js",
@@ -152,14 +123,6 @@ module.exports = [
         ]
     },
     {
-        "file": "plugins/cordova-plugin-app-version/www/AppVersionPlugin.js",
-        "id": "cordova-plugin-app-version.AppVersionPlugin",
-        "pluginId": "cordova-plugin-app-version",
-        "clobbers": [
-            "cordova.getAppVersion"
-        ]
-    },
-    {
         "file": "plugins/phonegap-plugin-barcodescanner/www/barcodescanner.js",
         "id": "phonegap-plugin-barcodescanner.BarcodeScanner",
         "pluginId": "phonegap-plugin-barcodescanner",
@@ -172,6 +135,36 @@ module.exports = [
         "id": "phonegap-plugin-barcodescanner.BarcodeScannerProxy",
         "pluginId": "phonegap-plugin-barcodescanner",
         "runs": true
+    },
+    {
+        "file": "plugins/cordova-sqlite-storage/www/SQLitePlugin.js",
+        "id": "cordova-sqlite-storage.SQLitePlugin",
+        "pluginId": "cordova-sqlite-storage",
+        "clobbers": [
+            "SQLitePlugin"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-splashscreen/src/browser/SplashScreenProxy.js",
+        "id": "cordova-plugin-splashscreen.SplashScreenProxy",
+        "pluginId": "cordova-plugin-splashscreen",
+        "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+        "id": "cordova-plugin-splashscreen.SplashScreen",
+        "pluginId": "cordova-plugin-splashscreen",
+        "clobbers": [
+            "navigator.splashscreen"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-appversion/www/app-version.js",
+        "id": "cordova-plugin-appversion.RareloopAppVersion",
+        "pluginId": "cordova-plugin-appversion",
+        "clobbers": [
+            "AppVersion"
+        ]
     },
     {
         "file": "plugins/cordova-plugin-googlemaps/www/Promise.js",
@@ -295,6 +288,24 @@ module.exports = [
     {
         "file": "plugins/cordova-plugin-googlemaps/www/LocationService.js",
         "id": "cordova-plugin-googlemaps.LocationService",
+        "pluginId": "cordova-plugin-googlemaps",
+        "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-googlemaps/www/ElevationService.js",
+        "id": "cordova-plugin-googlemaps.ElevationService",
+        "pluginId": "cordova-plugin-googlemaps",
+        "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-googlemaps/www/DirectionsService.js",
+        "id": "cordova-plugin-googlemaps.DirectionsService",
+        "pluginId": "cordova-plugin-googlemaps",
+        "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-googlemaps/www/DirectionsRenderer.js",
+        "id": "cordova-plugin-googlemaps.DirectionsRenderer",
         "pluginId": "cordova-plugin-googlemaps",
         "runs": true
     },
@@ -475,6 +486,18 @@ module.exports = [
         "runs": true
     },
     {
+        "file": "plugins/cordova-plugin-googlemaps/src/browser/PluginElevationService.js",
+        "id": "cordova-plugin-googlemaps.PluginElevationService",
+        "pluginId": "cordova-plugin-googlemaps",
+        "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-googlemaps/src/browser/PluginDirectionsService.js",
+        "id": "cordova-plugin-googlemaps.PluginDirectionsService",
+        "pluginId": "cordova-plugin-googlemaps",
+        "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-googlemaps/src/browser/PluginGeocoder.js",
         "id": "cordova-plugin-googlemaps.PluginGeocoder",
         "pluginId": "cordova-plugin-googlemaps",
@@ -513,26 +536,28 @@ module.exports.metadata =
     "cordova-plugin-whitelist": "1.3.4",
     "cordova-plugin-statusbar": "2.4.3",
     "cordova-plugin-device": "2.0.3",
-    "cordova-plugin-splashscreen": "5.0.4",
     "cordova-plugin-ionic-webview": "5.0.0",
     "cordova-plugin-ionic-keyboard": "2.2.0",
     "cordova-plugin-geolocation": "4.0.2",
     "cordova-plugin-uniquedeviceid": "1.3.2",
     "com-darryncampbell-cordova-plugin-intent": "2.0.0",
-    "cordova-plugin-inappbrowser": "3.2.0",
     "call-number": "0.0.2",
     "cordova-plugin-android-permissions": "1.0.2",
     "cordova-plugin-camera": "4.1.0",
     "cordova-plugin-vibration": "3.1.1",
     "cordova-plugin-screen-orientation": "3.0.2",
-    "cordova-plugin-app-version": "0.1.9",
-    "cordova-plugin-androidx": "1.0.2",
     "cordova.plugins.diagnostic": "5.0.2",
     "phonegap-plugin-barcodescanner": "8.1.0",
-    "com.googlemaps.ios": "3.8.0",
-    "cordova-plugin-googlemaps": "2.7.1",
+
+    "cordova-sqlite-storage": "5.0.1",
+    "cordova-plugin-splashscreen": "6.0.0",
+    "cordova-plugin-appversion": "1.0.0",
+    "com.googlemaps.ios": "3.9.0",
     "cordova-plugin-androidx-adapter": "1.1.1",
-    "cordova-plugin-ionic": "5.4.7"
+    "cordova-plugin-googlemaps": "2.8.0-20200709-2008",
+    "cordova-plugin-androidx": "2.0.0",
+    "cordova-plugin-firebasex": "10.2.0-cli"
+
 }
 // BOTTOM OF METADATA
 });

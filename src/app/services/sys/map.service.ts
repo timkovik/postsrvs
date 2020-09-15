@@ -1,18 +1,18 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Geolocation, GeolocationOptions } from "@ionic-native/geolocation/ngx";
-import { Device } from "@ionic-native/device/ngx";
-import { Response } from "./../../interfaces/response";
-import { Observable, Subject } from "rxjs";
-import {
-  GoogleMaps,
-  GoogleMap,
-  GoogleMapsEvent,
-  GoogleMapOptions,
-  Environment,
-} from "@ionic-native/google-maps";
-import { Platform } from "@ionic/angular";
 import { Router } from "@angular/router";
+import { Device } from "@ionic-native/device/ngx";
+import { Geolocation } from "@ionic-native/geolocation/ngx";
+import {
+  Environment, GoogleMap,
+
+  GoogleMapOptions, GoogleMaps,
+
+  GoogleMapsEvent
+} from "@ionic-native/google-maps/ngx";
+import { Platform, PopoverController } from "@ionic/angular";
+import { Observable, Subject } from "rxjs";
+import { Order } from 'src/app/interfaces/order';
 @Injectable({
   providedIn: "root",
 })
@@ -25,12 +25,13 @@ export class MapService {
     private geo: Geolocation,
     private device: Device,
     private platform: Platform,
-    private router: Router
-  ) {}
+    private router: Router,
+    public viewCtrl: PopoverController
+  ) { }
 
   public getWay(coords: { lt: number; lg: number }): Observable<any> {
     const url =
-      "http://mobile.postsrvs.ru:8080/https://postsrvs.ru/mobile/orders";
+      "http://mobile.postsrvs.ru:8080/https://mobile.postsrvs.ru/mobile/orders";
     let data = {
       action: "getWay",
       lt: coords?.lt,
@@ -131,13 +132,23 @@ export class MapService {
     this.map.clear();
   }
 
-  orderDetails(orderId) {
+  orderDetails(orderId: string) {
     console.log("sys:: переход на страницу заказа ", orderId);
     this.router.navigate(["/order", orderId]);
     localStorage.removeItem("needOrder");
+    this.viewCtrl.dismiss();
   }
 
   public navigate(page: any) {
     this.router.navigate(page);
+  }
+
+  public showRoute(order: Order) {
+    const meta = {
+      label: 'showRouteToOrder',
+      order
+    };
+    this.infoUpdated.next(meta);
+    this.router.navigate(['map']);
   }
 }

@@ -1,11 +1,11 @@
-import { Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 //Отдельный сервис для лучших реализаций функционала
 //Если есть выбор велосипедов для решения задаи в этом приложении - выбирай велосипеды из этого комплекта
-
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { SysService } from '../services/sys.service';
+import { FirebaseX } from '@ionic-native/firebase-x/ngx';
+import { Subject } from 'rxjs';
 import { Rules } from '../interfaces/rules';
+import { SysService } from '../services/sys.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -30,7 +30,9 @@ export class SettingsService {
   public state = new Subject();
   constructor(
     private http: HttpClient,
-    public sys: SysService
+    public sys: SysService,
+    private firebase: FirebaseX
+
   ) {
 
   }
@@ -54,8 +56,7 @@ export class SettingsService {
 
   //Получение настроек с сервака
   //@cid - id курьера
-  public getSettings(cid) {
-    let self = this;
+  public getSettings(cid: string) {
     let data = {
       cid: cid
     }
@@ -66,14 +67,18 @@ export class SettingsService {
       'typeRoute': 'routingModeAuto',
       'storeCheckMode': 'checkout'
     };
-    const url = this.sys.proxy + 'https://postsrvs.ru/mobile/getRules.php';
-    this.http.post(url, data).subscribe((data: { success: boolean, rules: any }) => {
+    const url = this.sys.proxy + 'https://mobile.postsrvs.ru/mobile/getRules.php';
+    this.http.post(url, data).subscribe((data: { success: boolean, rules: Rules }) => {
       if (data.success == true) {
         this.rules = data.rules;
         this.state.next('hasRules');
         if (data.rules.typeRoute == 'standart') {
           this.routingModeAuto = false;
         }
+        Object.entries(data.rules).forEach(([key, val]) => {
+          this.firebase.setUserProperty(key, val)
+        })
+
       }
     })
   }
