@@ -8,66 +8,66 @@
   },
   "installed_plugins": {
     "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-statusbar": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-device": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-ionic-webview": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-ionic-keyboard": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-geolocation": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-uniquedeviceid": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "com-darryncampbell-cordova-plugin-intent": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "call-number": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-android-permissions": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-vibration": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-screen-orientation": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "phonegap-plugin-barcodescanner": {
       "ANDROID_SUPPORT_V4_VERSION": "27.+",
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-androidx": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-androidx-adapter": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-sqlite-storage": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-splashscreen": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-network-information": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-camera": {
       "ANDROID_SUPPORT_V4_VERSION": "27.+",
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-googlemaps": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-firebasex": {
       "FIREBASE_ANALYTICS_COLLECTION_ENABLED": "true",
@@ -84,25 +84,18 @@
       "ANDROID_FIREBASE_CRASHLYTICS_VERSION": "17.0.1",
       "ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION": "17.0.1",
       "ANDROID_GSON_VERSION": "2.8.6",
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-plugin-update-notifier": {
-      "PACKAGE_NAME": "postsrvs.i"
-    },
-    "cordova-plugin-android-support-v4-jar": {
-      "PACKAGE_NAME": "postsrvs.i"
-    },
-    "cordova-android-support-gradle-release": {
-      "ANDROID_SUPPORT_VERSION": "27.+",
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     }
   },
   "dependent_plugins": {
     "es6-promise-plugin": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     },
     "cordova-androidx-build": {
-      "PACKAGE_NAME": "postsrvs.i"
+      "PACKAGE_NAME": "postsrvs.w"
     }
   }
 }

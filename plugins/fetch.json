@@ -222,21 +222,5 @@
     },
     "is_top_level": true,
     "variables": {}
-  },
-  "cordova-plugin-android-support-v4-jar": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-android-support-v4-jar@^23.2.1"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-android-support-gradle-release": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-android-support-gradle-release"
-    },
-    "is_top_level": true,
-    "variables": {}
   }
 }

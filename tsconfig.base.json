@@ -32,6 +32,7 @@
     "strictDomLocalRefTypes": true,
     "strictContextGenerics": true,
     "strictLiteralTypes": true,
-    "strictBindCallApply": true
+    "strictBindCallApply": true,
+    // "strictNullChecks":true
   }
 }

@@ -94,7 +94,7 @@ export class StateService {
   //обновляем все данные с сервера
   public updateWayInfo: Subject<any> = new Subject();
   // DATA
-  public orders_data: Order[] = null;
+  public orders_data: Order[] | null = null;
   public statuses_data: unknown = null;
   public coords: any;
   public filial: string = '';
