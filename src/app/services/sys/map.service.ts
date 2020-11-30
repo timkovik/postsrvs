@@ -65,10 +65,10 @@ export class MapService {
 
     if (this.map) {
       await new Promise((resolve) => {
-        const instance: any = setInterval(() => {
+        const instance: any | void = setInterval(() => {
           if (document.querySelectorAll("#" + divId).length > 0) {
             clearInterval(instance);
-            resolve();
+            resolve(null);
           }
         }, 100);
       });
@@ -97,7 +97,7 @@ export class MapService {
     this.map = GoogleMaps.create(divId, options);
     return new Promise((resolve) => {
       this.map.one(GoogleMapsEvent.MAP_READY).then(() => {
-        resolve();
+        resolve(null);
       });
     });
   }

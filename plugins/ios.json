@@ -46,6 +46,9 @@
     "phonegap-plugin-barcodescanner": {
       "PACKAGE_NAME": "postsrvs.i"
     },
+    "cordova-plugin-androidx": {
+      "PACKAGE_NAME": "postsrvs.i"
+    },
     "cordova-plugin-androidx-adapter": {
       "PACKAGE_NAME": "postsrvs.i"
     },
@@ -74,19 +77,16 @@
     },
     "cordova-plugin-update-notifier": {
       "PACKAGE_NAME": "postsrvs.i"
+    },
+    "cordova-plugin-android-support-v4-jar": {
+      "PACKAGE_NAME": "postsrvs.i"
+    },
+    "cordova-android-support-gradle-release": {
+      "PACKAGE_NAME": "postsrvs.i"
     }
   },
   "dependent_plugins": {
     "com.googlemaps.ios": {
-      "PACKAGE_NAME": "postsrvs.i"
-    },
-    "cordova-plugin-androidx": {
-      "PACKAGE_NAME": "postsrvs.i"
-    },
-    "cordova-androidx-build": {
-      "PACKAGE_NAME": "postsrvs.i"
-    },
-    "es6-promise-plugin": {
       "PACKAGE_NAME": "postsrvs.i"
     }
   }

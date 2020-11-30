@@ -71,7 +71,6 @@
 		"cordova-plugin-camera": "5.0.0",
 		"cordova-plugin-firebasex": "10.2.0-cli",
 		"cordova-plugin-geolocation": "4.0.2",
-		"cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git#multiple_maps",
 		"cordova-plugin-network-information": "^2.0.2",
 		"cordova-plugin-screen-orientation": "^3.0.2",
 		"cordova-plugin-splashscreen": "^6.0.0",
@@ -81,7 +80,7 @@
 		"cordova-sqlite-storage": "^5.0.0",
 		"cordova-support-android-plugin": "1.0.2",
 		"cordova-support-google-services": "1.4.1",
-		"core-js": "^3.6.4",
+		"core-js": "^3.8.0",
 		"es6-promise-plugin": "^4.2.2",
 		"feather-icons": "^4.28.0",
 		"ionic-cache": "^5.2.0",
@@ -130,7 +129,10 @@
 		"babel-jest": "^25.1.0",
 		"codelyzer": "^6.0.1",
 		"cordova-android": "^9.0.0",
+		"cordova-android-support-gradle-release": "^3.0.1",
+		"cordova-plugin-android-support-v4-jar": "^23.2.1",
 		"cordova-plugin-device": "^2.0.3",
+		"cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git#multiple_maps",
 		"cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git",
 		"cordova-plugin-ionic-keyboard": "^2.2.0",
 		"cordova-plugin-ionic-webview": "^5.0.0",
@@ -162,7 +164,9 @@
 			"cordova-plugin-whitelist": {},
 			"cordova-plugin-statusbar": {},
 			"cordova-plugin-device": {},
-			"cordova-plugin-ionic-webview": {},
+			"cordova-plugin-ionic-webview": {
+				"ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
+			},
 			"cordova-plugin-ionic-keyboard": {},
 			"cordova-plugin-geolocation": {},
 			"cordova-plugin-uniquedeviceid": {},
@@ -175,6 +179,7 @@
 			"phonegap-plugin-barcodescanner": {
 				"ANDROID_SUPPORT_V4_VERSION": "27.+"
 			},
+			"cordova-plugin-androidx": {},
 			"cordova-plugin-androidx-adapter": {},
 			"cordova-sqlite-storage": {},
 			"cordova-plugin-splashscreen": {},
@@ -186,14 +191,33 @@
 				"LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
 				"LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
 			},
-			"cordova-plugin-firebasex": {},
+			"cordova-plugin-firebasex": {
+				"FIREBASE_ANALYTICS_COLLECTION_ENABLED": "true",
+				"FIREBASE_PERFORMANCE_COLLECTION_ENABLED": "true",
+				"FIREBASE_CRASHLYTICS_COLLECTION_ENABLED": "true",
+				"ANDROID_ICON_ACCENT": "#FF00FFFF",
+				"ANDROID_PLAY_SERVICES_AUTH_VERSION": "18.0.0",
+				"ANDROID_FIREBASE_ANALYTICS_VERSION": "17.4.3",
+				"ANDROID_FIREBASE_MESSAGING_VERSION": "20.2.1",
+				"ANDROID_FIREBASE_CONFIG_VERSION": "19.1.4",
+				"ANDROID_FIREBASE_PERF_VERSION": "19.0.7",
+				"ANDROID_FIREBASE_AUTH_VERSION": "19.3.1",
+				"ANDROID_FIREBASE_FIRESTORE_VERSION": "21.4.3",
+				"ANDROID_FIREBASE_CRASHLYTICS_VERSION": "17.0.1",
+				"ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION": "17.0.1",
+				"ANDROID_GSON_VERSION": "2.8.6"
+			},
 			"com.googlemaps.ios": {},
-			"cordova-plugin-update-notifier": {}
+			"cordova-plugin-update-notifier": {},
+			"cordova-plugin-android-support-v4-jar": {},
+			"cordova-android-support-gradle-release": {
+				"ANDROID_SUPPORT_VERSION": "27.+"
+			}
 		},
 		"platforms": [
-			"android",
 			"ios",
-			"browser"
+			"browser",
+			"android"
 		]
 	}
 }

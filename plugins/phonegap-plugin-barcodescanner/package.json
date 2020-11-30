@@ -25,7 +25,7 @@
   "_resolved": "https://registry.npmjs.org/phonegap-plugin-barcodescanner/-/phonegap-plugin-barcodescanner-8.1.0.tgz",
   "_shasum": "e0d53e4e850699205e915a4b91c2f202d31f8311",
   "_spec": "phonegap-plugin-barcodescanner@^8.1.0",
-  "_where": "/Users/timkovik/Documents/postsrvs",
+  "_where": "/Users/admin/Documents/postsrvs",
   "author": {
     "name": "Adobe PhoneGap Team"
   },
@@ -46,7 +46,7 @@
     "nopt": "^4.0.1",
     "shelljs": "^0.8.3"
   },
-  "deprecated": false,
+  "deprecated": "This package is deprecated, see https://blog.phonegap.com/update-for-customers-using-phonegap-and-phonegap-build-cc701c77502c",
   "description": "You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.",
   "devDependencies": {
     "jasmine-node": "1.14.5",
