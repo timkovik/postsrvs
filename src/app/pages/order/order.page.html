@@ -156,6 +156,18 @@
       Показать на карте
     </ion-button>
   </div>
+
+  <div class='order__taimer'>
+    <p class='order__taimer-title'>Время ожидания клиента, мин</p>
+    <div class='order__taimer-table'>
+      <p class='order__taimer-time'>{{timerTime}}</p>
+      <ion-button class='order__taimer-input' type='checkbox' (click)='startTimer()' *ngIf='!play'>Старт</ion-button>
+      <ion-button class='order__taimer-input  order__taimer-input_stop' type='checkbox' (click)='pauseTimer()' *ngIf='play'>Стоп</ion-button>
+    </div>
+    <p class='order__taimer-stopwatch' *ngIf='play'>{{timerTime}}</p>
+  </div>
+
+
   <div id='done-buttons' *ngIf="!(status_id == 5 || status_id == 6)" [intro]="introItems" [Order]="6">
     <ion-button expand="full" fill="solid" shape="round" id='light-purple-button' class='action'
       (click)="selectStatus(4); presentNotDeliveredModal()">

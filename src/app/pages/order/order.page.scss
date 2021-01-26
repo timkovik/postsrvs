@@ -516,3 +516,60 @@ ion-content {
   text-transform: uppercase;
   box-shadow: 0 0 1px 1px #f55656;
 }
+
+.order__taimer{
+  padding: 22px 16px 5px;
+}
+
+.order__taimer-title{
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 16px;
+  margin: 0;
+}
+
+.order__taimer-table{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+}
+
+.order__taimer-time{
+  padding: 7px auto 7px 11px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  background-color: #EEEEEE;
+  max-width: 227px;
+  width: 100%;
+  border: 1px solid #D6CFCF;
+  margin: 0;
+}
+
+.order__taimer-input{
+  padding: 8px 33px;
+  background-color: #D7F3DD;
+  border: none;
+  outline: none;
+  margin: 0;
+}
+
+.order__taimer-input_stop{
+  background-color: #FFCCDB;
+}
+
+.order__taimer-stopwatch{
+  text-align: center;
+  margin: 5px auto 5px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 48px;
+  line-height: 56px;
+}
+

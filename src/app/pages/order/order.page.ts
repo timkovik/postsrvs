@@ -33,27 +33,31 @@ import { MapService } from '../../services/sys/map.service';
 import { OrderService } from '../../services/sys/order.service';
 import { DrawPage } from '../draw/draw.page';
 import { DataService } from './../../services/sys/data.service';
+import { interval } from "rxjs";
 
 @Component({
-  selector: 'app-order',
+  selector: "app-order",
   animations: [
-    trigger('openClose', [
+    trigger("openClose", [
       // ...
-      state('open', style({
-        height: '264px',
-      })),
-      state('closed', style({
-        height: '50px',
-      })),
-      transition('open => closed', [
-        animate('0.5s')
-      ]),
-      transition('closed => open', [
-        animate('0.5s')
-      ]),
-    ])],
-  templateUrl: './order.page.html',
-  styleUrls: ['./order.page.scss'],
+      state(
+        "open",
+        style({
+          height: "264px",
+        })
+      ),
+      state(
+        "closed",
+        style({
+          height: "50px",
+        })
+      ),
+      transition("open => closed", [animate("0.5s")]),
+      transition("closed => open", [animate("0.5s")]),
+    ]),
+  ],
+  templateUrl: "./order.page.html",
+  styleUrls: ["./order.page.scss"],
 })
 export class OrderPage implements OnInit {
   public orderId: string = null;
@@ -69,35 +73,35 @@ export class OrderPage implements OnInit {
   public phone: string = null;
   public pageInit = true;
   public statuses: Statuses[] = [
-    { id: 4, status: 'Не доставлено' },
-    { id: 5, status: 'Доставлено' },
-    { id: 6, status: 'Частично доставлено' },
+    { id: 4, status: "Не доставлено" },
+    { id: 5, status: "Доставлено" },
+    { id: 6, status: "Частично доставлено" },
   ];
   public reasons: Reason[] = [
-    { id: 1, reason: 'Не удалось Дозвониться!' },
-    { id: 2, reason: 'Отказ, при созвоне с клиентом' },
-    { id: 3, reason: 'Отказ от доставки без объяснения причины' },
-    { id: 4, reason: 'Ошибка оформления ИМ' },
-    { id: 5, reason: 'Получатель передумал' },
-    { id: 6, reason: 'Товар не подошел/не понравился' },
-    { id: 7, reason: 'Финансовые трудности у получателя' },
-    { id: 8, reason: 'Перенос даты доставки получателем.' },
-    { id: 10, reason: 'Не успел' },
-    { id: 11, reason: 'Переехали/нев.Адрес' },
+    { id: 1, reason: "Не удалось Дозвониться!" },
+    { id: 2, reason: "Отказ, при созвоне с клиентом" },
+    { id: 3, reason: "Отказ от доставки без объяснения причины" },
+    { id: 4, reason: "Ошибка оформления ИМ" },
+    { id: 5, reason: "Получатель передумал" },
+    { id: 6, reason: "Товар не подошел/не понравился" },
+    { id: 7, reason: "Финансовые трудности у получателя" },
+    { id: 8, reason: "Перенос даты доставки получателем." },
+    { id: 10, reason: "Не успел" },
+    { id: 11, reason: "Переехали/нев.Адрес" },
   ];
   public commentText: any = null;
   public g_quants: any = {};
   public changeWindow = false;
-  public selectedPayment = '1';
-  public client_status = '';
-  public client_status_dt = '';
-  public client_status_id = '';
+  public selectedPayment = "1";
+  public client_status = "";
+  public client_status_dt = "";
+  public client_status_id = "";
   public vlog: string = null;
   public poruch: string = null;
   public mass: unknown = null;
   public amount: unknown = null;
-  public email_input = '';
-  public phone_input = '';
+  public email_input = "";
+  public phone_input = "";
   public barcode_flag = false;
   public barcode_url: string = null;
   public barcode: unknown = null;
@@ -125,13 +129,13 @@ export class OrderPage implements OnInit {
   public drawNeedle = true;
   public cardNums: string;
   public introItems = {
-    Group: '3',
-    1: 'Звонок клиенту',
-    2: 'Посмотреть дополнительную информацию об отправителе',
-    3: 'Ваша заметка о заказе',
-    4: 'Открыть маршрут до заказа в Яндекс.Навигаторе',
-    5: 'Показать на карте маршрут до заказа',
-    6: 'Кнопки закрытия заказа'
+    Group: "3",
+    1: "Звонок клиенту",
+    2: "Посмотреть дополнительную информацию об отправителе",
+    3: "Ваша заметка о заказе",
+    4: "Открыть маршрут до заказа в Яндекс.Навигаторе",
+    5: "Показать на карте маршрут до заказа",
+    6: "Кнопки закрытия заказа",
   };
   public waitingMinutes: number;
 
@@ -154,32 +158,77 @@ export class OrderPage implements OnInit {
     public modalController: ModalController,
     private firebase: FirebaseX,
     public introService: IntroJsService
-
   ) {
-    this.orderId = this.route.snapshot.paramMap.get('id');
+    this.orderId = this.route.snapshot.paramMap.get("id");
 
-    const img = localStorage.getItem('drawImg');
+    const img = localStorage.getItem("drawImg");
     if (img) {
       this.imageToShow = `data:image/jpg;base64,${img}`;
     }
     this.introService.intro
-      .setOption('prevLabel', 'Назад')
-      .setOption('nextLabel', 'Далее')
-      .setOption('skipLabel', 'Пропустить')
-      .setOption('doneLabel', 'Завершить')
-      .setOption('scrollToElement', true)
-      .setOption('scrollTo', 'element');
+      .setOption("prevLabel", "Назад")
+      .setOption("nextLabel", "Далее")
+      .setOption("skipLabel", "Пропустить")
+      .setOption("doneLabel", "Завершить")
+      .setOption("scrollToElement", true)
+      .setOption("scrollTo", "element");
   }
+
+  public play: boolean = false;
+  public time: number = 0;
+  public ss: any = 0;
+  public mm: any = 0;
+  public hh: any = 0;
+  public timerID: any  = 0;
+  public timerTime: any = 0;
+
+  public startTimer() {
+    this.play = true;
+    this.timerID = setInterval(() => {
+      this.time++;
+      this.doTime();
+      console.log(this.time);;;
+    }, 1000);
+
+  }
+
+  public pauseTimer() {
+    this.play = false;
+    clearTimeout(this.timerID);
+    const timeWatch: number = this.time;
+    console.log(timeWatch);
+  }
+
+   doTime() {
+    this.hh = Math.floor(this.time / 3600);
+    this.mm = Math.floor((this.time - (this.time / 3600)) / 60);
+    this.ss = this.time - (this.hh * 3600) - (this.mm * 60);
+
+    if (this.hh < 10) {
+      this.hh = "0" + this.hh;
+    }
+    if (this.mm < 10) {
+      this.mm = "0" + this.mm;
+    }
+    if (this.ss < 10) {
+      this.ss = "0" + this.ss;
+    }
+
+    this.timerTime = this.hh  + ':' + this.mm + ':' + this.ss;
+
+  }
+
+
 
   ngOnInit() {
     this.initOrder();
     this.courier.initStatuses();
     this.note = localStorage.getItem(this.orderId);
-    this.firebase.setScreenName('order');
+    this.firebase.setScreenName("order");
   }
 
   ngAfterViewChecked() {
-    const img = localStorage.getItem('drawImg');
+    const img = localStorage.getItem("drawImg");
     if (img) {
       this.imageToShow = `data:image/jpg;base64,${img}`;
     }
@@ -196,35 +245,34 @@ export class OrderPage implements OnInit {
     if (need) {
       this.draw();
     } else {
-      localStorage.removeItem('drawImg');
+      localStorage.removeItem("drawImg");
     }
   }
   public async draw() {
     const modal = await this.modalController.create({
       component: DrawPage,
-      showBackdrop: false
+      showBackdrop: false,
     });
     await modal.present();
     const details = await modal.onDidDismiss();
-    console.log('sys:: drawModal dismiss details: ', details);
-    if (details.data == 'ok') {
+    console.log("sys:: drawModal dismiss details: ", details);
+    if (details.data == "ok") {
       this.doneOrder();
     }
   }
 
   public parsePhone(phone: string): Array<string> {
-
     return this.orderService.parsePhone(phone);
   }
 
   private normalizePhoneNumber(phone: string): string {
-    if (phone[0] !== '8' && phone[0] !== '7' && phone.length !== 11) {
+    if (phone[0] !== "8" && phone[0] !== "7" && phone.length !== 11) {
       phone = `8${phone}`;
     }
     if (phone.length == 7 || phone.length == 10) {
       phone = `8${phone}`;
     }
-    if (phone[0] !== '8' && phone.length == 11) {
+    if (phone[0] !== "8" && phone.length == 11) {
       phone = `8${phone.slice(1)}`;
     }
     return phone;
@@ -239,27 +287,27 @@ export class OrderPage implements OnInit {
     }
 
     switch (action) {
-      case 'init':
+      case "init":
         this.callWindow = !this.callWindow;
         break;
-      case 'phone':
-        this.CL.callNumber(this.selectedPhone, false).then(() => { });
+      case "phone":
+        this.CL.callNumber(this.selectedPhone, false).then(() => {});
         this.callWindow = false;
         break;
-      case 'operator':
-        if (this.network.type == 'none') {
-          this.phoneClick('phone');
+      case "operator":
+        if (this.network.type == "none") {
+          this.phoneClick("phone");
           return false;
         }
         if (this.selectedPhone && courierPhone) {
-          const url = 'orders';
+          const url = "orders";
           const data = {
-            action: 'send_phone',
+            action: "send_phone",
             client_number: this.selectedPhone,
             cur_number: courierPhone,
           };
           this.auth.sendPost(url, data).subscribe((resp) => {
-            console.log('call_subs', resp);
+            console.log("call_subs", resp);
           });
           this.auth.showError(9);
           this.callWindow = false;
@@ -269,9 +317,11 @@ export class OrderPage implements OnInit {
   }
 
   public initOrder() {
-    this.storage.get('orders').then((orders: Array<Order>) => {
-      this.order = orders?.filter((order: Order) => order.id.toString() == this.orderId)[0];
-      console.log('sys:: данные заказа: ', this.order);
+    this.storage.get("orders").then((orders: Array<Order>) => {
+      this.order = orders?.filter(
+        (order: Order) => order.id.toString() == this.orderId
+      )[0];
+      console.log("sys:: данные заказа: ", this.order);
       this.goods = this.order.goods;
       this.address = this.order.client_address;
       this.timeFrom = this.order.datetime_from;
@@ -303,7 +353,7 @@ export class OrderPage implements OnInit {
       }
     }
 
-    return '';
+    return "";
   }
   // Заполняет массив с ценой товаров и их количеством(для частички)
   public setQuants() {
@@ -327,7 +377,7 @@ export class OrderPage implements OnInit {
       }
     }
 
-    if (action == 'plus') {
+    if (action == "plus") {
       const n_q = q + 1;
 
       if (n_q > good.kol_vo) {
@@ -335,7 +385,7 @@ export class OrderPage implements OnInit {
       } else {
         this.g_quants[code].amount = n_q;
       }
-    } else if (action == 'minus') {
+    } else if (action == "minus") {
       const n_q = q - 1;
 
       if (n_q < 0) {
@@ -343,16 +393,15 @@ export class OrderPage implements OnInit {
       } else {
         this.g_quants[code].amount = n_q;
       }
-    } else if (action == 'delete') {
+    } else if (action == "delete") {
       this.g_quants[code].amount = 0;
     }
     this.getSum();
   }
 
-
   public navBack() {
-    localStorage.removeItem('drawImg');
-    this.router.navigate(['/courier']);
+    localStorage.removeItem("drawImg");
+    this.router.navigate(["/courier"]);
   }
 
   public getStatus(): string {
@@ -380,28 +429,55 @@ export class OrderPage implements OnInit {
     }
   }
 
-
-  public sendPayCall(order: Order = this.order, newStatus = this.selectedStatus as number) {
+  public sendPayCall(
+    order: Order = this.order,
+    newStatus = this.selectedStatus as number
+  ) {
     order.goods = this.changeGoods(order, this.g_quants);
-    if (this.network.type == 'none') {
+    if (this.network.type == "none") {
       // Если оффлайн
-      order = { ...{ phone_input: this.phone_input }, ...{ email_input: this.email_input }, ...{ quants: this.g_quants }, ...order, ...{ selectedPayment: this.selectedPayment }, ...{ selectedReason: this.selectedReason }, ...{ new_plan_date: this.new_plan_date }, ...{ commentText: this.commentText }, ...{ check: this.checkBase64Image }, ...{ cardNums: this.cardNums }, ...{ goods: this.goods } };
-      console.log(`sys:: Отложено изменение статуса на ${newStatus} для заказа ${order.client_id}`);
+      order = {
+        ...{ phone_input: this.phone_input },
+        ...{ email_input: this.email_input },
+        ...{ quants: this.g_quants },
+        ...order,
+        ...{ selectedPayment: this.selectedPayment },
+        ...{ selectedReason: this.selectedReason },
+        ...{ new_plan_date: this.new_plan_date },
+        ...{ commentText: this.commentText },
+        ...{ check: this.checkBase64Image },
+        ...{ cardNums: this.cardNums },
+        ...{ goods: this.goods },
+      };
+      console.log(
+        `sys:: Отложено изменение статуса на ${newStatus} для заказа ${order.client_id}`
+      );
       this.localModifyOrders(newStatus, order.goods);
       this.orderService.sendDelayedCall(order, newStatus);
-      this.router.navigate(['courier']);
+      this.router.navigate(["courier"]);
     } else {
       // Если онлайн
-      order = { ...{ phone_input: this.phone_input }, ...{ email_input: this.email_input }, ...{ quants: this.g_quants }, ...order, ...{ selectedPayment: this.selectedPayment }, ...{ selectedReason: this.selectedReason }, ...{ new_plan_date: this.new_plan_date }, ...{ commentText: this.commentText }, ...{ check: this.checkBase64Image }, ...{ cardNums: this.cardNums } };
+      order = {
+        ...{ phone_input: this.phone_input },
+        ...{ email_input: this.email_input },
+        ...{ quants: this.g_quants },
+        ...order,
+        ...{ selectedPayment: this.selectedPayment },
+        ...{ selectedReason: this.selectedReason },
+        ...{ new_plan_date: this.new_plan_date },
+        ...{ commentText: this.commentText },
+        ...{ check: this.checkBase64Image },
+        ...{ cardNums: this.cardNums },
+      };
       this.localModifyOrders(newStatus, order.goods);
       this.orderService.sendDelayedCall(order, newStatus);
-      this.router.navigate(['courier']);
+      this.router.navigate(["courier"]);
     }
   }
 
   public submitChange() {
     const self = this;
-    this.storage.get('orders').then((orders) => {
+    this.storage.get("orders").then((orders) => {
       orders?.map((order: Order) => {
         if (String(order.id) == String(this.order.id)) {
           order.status_id = this.selectedStatus;
@@ -427,25 +503,25 @@ export class OrderPage implements OnInit {
               new_plan_date.toLocaleDateString()
             )
             .subscribe((data: any) => {
-              if (data.success == 'true') {
+              if (data.success == "true") {
                 self.changeWindow = false;
-                self.state$.state.next('init');
-                self.selectedPayment = '1';
+                self.state$.state.next("init");
+                self.selectedPayment = "1";
                 self.selectedReason = null;
                 self.selectedStatus = null;
-                self.router.navigate(['courier']);
-                self.state$.updateWayInfo.next('0');
+                self.router.navigate(["courier"]);
+                self.state$.updateWayInfo.next("0");
               }
-              localStorage.removeItem('drawImg');
+              localStorage.removeItem("drawImg");
             });
         }
         break;
       case 5:
-        if (this.selectedPayment !== '2') {
+        if (this.selectedPayment !== "2") {
           noSkip = false;
         }
         this.sys.doOCR(this.checkBase64Image, noSkip).then((recognizedData) => {
-          const text = (this.commentText ? this.commentText : '');
+          const text = this.commentText ? this.commentText : "";
           this.courier
             .changeStatus(
               this.selectedStatus,
@@ -454,30 +530,29 @@ export class OrderPage implements OnInit {
               undefined,
               undefined,
               this.selectedPayment,
-              '',
+              "",
               this.checkBase64Image,
               recognizedData
             )
             .subscribe((data: any) => {
-              if (data.success == 'true') {
+              if (data.success == "true") {
                 self.changeWindow = false;
-                self.state$.state.next('init');
-                self.selectedPayment = '1';
+                self.state$.state.next("init");
+                self.selectedPayment = "1";
                 self.selectedReason = null;
                 self.selectedStatus = null;
                 if (!self.pay_access) {
-                  self.router.navigate(['courier']);
+                  self.router.navigate(["courier"]);
                 }
                 self.initOrder();
-                self.state$.updateWayInfo.next('0');
+                self.state$.updateWayInfo.next("0");
               }
-              localStorage.removeItem('drawImg');
+              localStorage.removeItem("drawImg");
             });
         });
         break;
       case 6:
-
-        if (this.selectedPayment !== '2') {
+        if (this.selectedPayment !== "2") {
           noSkip = false;
         }
         this.sys.doOCR(this.checkBase64Image, noSkip).then((recognizedData) => {
@@ -489,30 +564,30 @@ export class OrderPage implements OnInit {
               undefined,
               this.g_quants,
               this.selectedPayment,
-              '',
+              "",
               this.checkBase64Image,
               recognizedData
             )
             .subscribe((data: any | null) => {
-              if (data?.success == 'true') {
+              if (data?.success == "true") {
                 self.changeWindow = false;
-                self.state$.state.next('init');
-                self.selectedPayment = '1';
+                self.state$.state.next("init");
+                self.selectedPayment = "1";
                 self.selectedReason = null;
                 self.selectedStatus = null;
                 if (!self.pay_access) {
-                  self.router.navigate(['courier']);
+                  self.router.navigate(["courier"]);
                 }
                 self.initOrder();
-                self.state$.updateWayInfo.next('0');
+                self.state$.updateWayInfo.next("0");
               } else {
                 this.sys.presentToast(
-                  'Нет товаров в заказе',
-                  'danger',
-                  'Частичная доставка невозможна'
+                  "Нет товаров в заказе",
+                  "danger",
+                  "Частичная доставка невозможна"
                 );
               }
-              localStorage.removeItem('drawImg');
+              localStorage.removeItem("drawImg");
             });
         });
         break;
@@ -550,8 +625,7 @@ export class OrderPage implements OnInit {
   public sendPay() {
     const goods = this.order.goods;
     const quants = this.g_quants;
-    const callback_url =
-      `${this.sys.proxy}https://mobile.postsrvs.ru/mobile/pay_callback.php`;
+    const callback_url = `${this.sys.proxy}https://mobile.postsrvs.ru/mobile/pay_callback.php`;
     const products = [];
 
     for (const code in quants) {
@@ -573,11 +647,10 @@ export class OrderPage implements OnInit {
     }
 
     const purchase = { products };
-    console.log('goods_description\n', purchase);
+    console.log("goods_description\n", purchase);
     const self = this;
 
     if (this.pay_access) {
-
       const order_data = {
         apikey: String(this.pay_access_data.api_key),
         login: String(this.pay_access_data.phone),
@@ -586,19 +659,19 @@ export class OrderPage implements OnInit {
           String(this.pay_access_data.phone),
         purchase,
         callback_url,
-        mode: 'email',
+        mode: "email",
         customer_email: this.email_input,
         customer_phone: this.phone_input,
-        card_amount: '',
-        cash_amount: ''
+        card_amount: "",
+        cash_amount: "",
       };
-      if (self.selectedPayment == '2') {
-        order_data.card_amount = '#';
+      if (self.selectedPayment == "2") {
+        order_data.card_amount = "#";
       } else {
-        order_data.cash_amount = '#';
+        order_data.cash_amount = "#";
       }
 
-      if (this.phone_input != '') {
+      if (this.phone_input != "") {
         order_data.customer_phone = this.phone_input;
       }
 
@@ -608,14 +681,13 @@ export class OrderPage implements OnInit {
 
   // Получаем api key & login
   public getPayData() {
-
-    const url = 'pay_order';
-    const data = { action: 'getData', orderId: this.clientId };
+    const url = "pay_order";
+    const data = { action: "getData", orderId: this.clientId };
     const self = this;
     if (navigator.onLine) {
       this.auth.sendPost(url, data).subscribe((res: any) => {
-        console.log('GET_PAY_DATA', res);
-        if (res.success == 'true') {
+        console.log("GET_PAY_DATA", res);
+        if (res.success == "true") {
           self.pay_access = true;
           self.pay_access_data = res;
         } else {
@@ -628,7 +700,7 @@ export class OrderPage implements OnInit {
   }
 
   public send_api_data(api_data: any) {
-    const url = 'pay_order';
+    const url = "pay_order";
     const self = this;
     if (api_data.products.length > 0) {
       this.order.rur = 0;
@@ -637,7 +709,7 @@ export class OrderPage implements OnInit {
       });
     }
     const data = {
-      action: 'sendPay',
+      action: "sendPay",
       orderData: api_data,
       orderId: this.order.id,
     };
@@ -649,37 +721,35 @@ export class OrderPage implements OnInit {
       });
     } else {
       let requests: any[] = [];
-      this.cache.getItem('requests').then((req) => {
+      this.cache.getItem("requests").then((req) => {
         if (req !== undefined) {
           requests = req;
         }
         requests.push({ url, data });
-        this.cache.saveItem('requests', requests);
+        this.cache.saveItem("requests", requests);
 
         self.submitChange();
         self.checkPayment();
         self.hide_status = true;
       });
-
     }
   }
-
 
   public checkPayment() {
     const self = this;
     this.state$.interval_1ss.pipe(takeUntil(this.$codeStop)).subscribe(() => {
       self.ifPaid();
-      console.log('paid_iter');
+      console.log("paid_iter");
     });
   }
 
   public ifPaid() {
-    const url = 'pay_order';
-    const data = { action: 'checkPaid', orderId: this.order.id };
+    const url = "pay_order";
+    const data = { action: "checkPaid", orderId: this.order.id };
     const self = this;
 
     this.auth.sendPost(url, data).subscribe((data) => {
-      if (data.success == 'true' && data.barcode != null) {
+      if (data.success == "true" && data.barcode != null) {
         self.barcode_flag = true;
         self.barcode_url = data.barcode_url;
         self.barcode = data.barcode;
@@ -699,8 +769,6 @@ export class OrderPage implements OnInit {
     }
   }
 
-
-
   public initClientInfo() {
     const mail_exp = /(?:([\s.,]{1}))([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}/gm;
     const infoStr = this.phone;
@@ -719,7 +787,6 @@ export class OrderPage implements OnInit {
 
   public showRoute(order: Order) {
     this.sysMap.showRoute(order);
-
   }
 
   public doneOrder() {
@@ -727,13 +794,13 @@ export class OrderPage implements OnInit {
     if (this.drawNeedle && !drawedImg) {
       this.drawBtn(this.drawNeedle);
     } else {
-      if (this.selectedPayment == '2') {
+      if (this.selectedPayment == "2") {
         this.sendPayCall();
         this.sys.checkPhoto().then((imageData) => {
           this.checkBase64Image = `data:image/jpeg;base64,${imageData}`;
           const url = `${this.sys.proxy}https://mobile.postsrvs.ru/mobile/orders`;
           const data = {
-            action: 'save_check_data',
+            action: "save_check_data",
             order_id: this.orderId,
             check_photo: this.checkBase64Image,
           };
@@ -742,7 +809,6 @@ export class OrderPage implements OnInit {
       } else {
         this.sendPayCall();
       }
-
     }
   }
 
@@ -757,34 +823,34 @@ export class OrderPage implements OnInit {
 
   public localModifyOrders(newStatus: number, goods: any[]) {
     const meta: Meta = {
-      label: 'localChanges'
+      label: "localChanges",
     };
-    this.storage.get('orders').then((orders) => {
+    this.storage.get("orders").then((orders) => {
       orders?.map((order: Order) => {
         if (order.id.toString() == this.order.id.toString()) {
           order.status_id = newStatus;
           order.goods = goods;
-          this.data.saveOrders(orders).then(() => this.sysMap.infoUpdated.next(meta));
+          this.data
+            .saveOrders(orders)
+            .then(() => this.sysMap.infoUpdated.next(meta));
           this.data.orders.next(orders);
         }
       });
     });
   }
 
-
-
   async presentNotDeliveredModal() {
     const modal = await this.modalController.create({
       component: NotDeliveredComponent,
-      cssClass: 'done-order-modal',
+      cssClass: "done-order-modal",
       componentProps: {
-        reasons: this.reasons
+        reasons: this.reasons,
       },
-      showBackdrop: true
+      showBackdrop: true,
     });
     await modal.present();
     const details = await modal.onDidDismiss();
-    console.log('sys:: dismiss details: ', details);
+    console.log("sys:: dismiss details: ", details);
     this.selectedReason = details.data.selectedReason;
     this.commentText = details.data.commentText;
     this.new_plan_date = details.data.new_plan_date;
@@ -794,45 +860,44 @@ export class OrderPage implements OnInit {
   async presentDeliveredModal() {
     const modal = await this.modalController.create({
       component: DeliveredComponent,
-      cssClass: 'done-order-modal',
+      cssClass: "done-order-modal",
       componentProps: {
         goods: this.goods,
         pay_type: this.order.pay_type,
-        pay_type_change_allowed: this.order.pay_type_change_allowed
+        pay_type_change_allowed: this.order.pay_type_change_allowed,
       },
-      showBackdrop: true
+      showBackdrop: true,
     });
     await modal.present();
     const details = await modal.onDidDismiss();
-    console.log('sys:: dismiss details: ', details);
+    console.log("sys:: dismiss details: ", details);
     this.drawNeedle = details.data.drawNeedle;
     this.selectedPayment = details.data.selectedPayment;
     this.email_input = details.data.email_input;
     this.phone_input = details.data.phone_input;
     this.commentText = details.data.commentText;
     this.cardNums = details.data.cardNums;
-    this.order.waitingMinutes = details.data.waitingMinutes
+    this.order.waitingMinutes = details.data.waitingMinutes;
     if (details.data) {
       this.doneOrder();
     }
-
   }
 
   public async presentPartDeliveredModal(orderId = this.order.id) {
     const modal = await this.modalController.create({
       component: PartDeliveredComponent,
-      cssClass: 'done-order-modal',
+      cssClass: "done-order-modal",
       componentProps: {
         goods: this.goods,
         pay_type: this.order.pay_type,
         pay_type_change_allowed: this.order.pay_type_change_allowed,
-        orderId
+        orderId,
       },
-      showBackdrop: true
+      showBackdrop: true,
     });
     await modal.present();
     const details = await modal.onDidDismiss();
-    console.log('sys:: dismiss details: ', details);
+    console.log("sys:: dismiss details: ", details);
     if (details.data) {
       this.drawNeedle = details.data.drawNeedle;
       this.selectedPayment = details.data.selectedPayment;
@@ -841,7 +906,7 @@ export class OrderPage implements OnInit {
       this.commentText = details.data.commentText;
       this.cardNums = details.data.cardNums;
       this.order.goods = details.data.goods;
-      this.order.waitingMinutes = details.data.waitingMinutes
+      this.order.waitingMinutes = details.data.waitingMinutes;
 
       this.setQuants();
       this.doneOrder();
@@ -858,6 +923,6 @@ export class OrderPage implements OnInit {
   }
 
   public showHelp() {
-    this.introService.start(null, '3');
+    this.introService.start(null, "3");
   }
 }

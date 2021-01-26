@@ -115,6 +115,7 @@ export class LoginPage implements OnInit {
 
   public scanAuth() {
     const self = this;
+    console.log(this.auth);
     this.auth.scanData().then((data) => {
       const id = data.text.slice(0, -4);
       localStorage.setItem('cId', id);
