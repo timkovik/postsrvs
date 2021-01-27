@@ -175,34 +175,34 @@ export class OrderPage implements OnInit {
   }
 
   public play: boolean = false;
-  public time: number = 0;
+  public timeWaitingClient: number = 0;
   public ss: any = 0;
   public mm: any = 0;
   public hh: any = 0;
-  public timerID: any  = 0;
+  public timerID: any = 0;
   public timerTime: any = 0;
 
   public startTimer() {
     this.play = true;
+    this.timeWaitingClient = 0;
     this.timerID = setInterval(() => {
-      this.time++;
+      this.timeWaitingClient++;
       this.doTime();
-      console.log(this.time);;;
+      console.log(this.timeWaitingClient);
     }, 1000);
-
   }
 
   public pauseTimer() {
     this.play = false;
     clearTimeout(this.timerID);
-    const timeWatch: number = this.time;
+    const timeWatch: number = this.timeWaitingClient;
     console.log(timeWatch);
   }
 
-   doTime() {
-    this.hh = Math.floor(this.time / 3600);
-    this.mm = Math.floor((this.time - (this.time / 3600)) / 60);
-    this.ss = this.time - (this.hh * 3600) - (this.mm * 60);
+  doTime() {
+    this.hh = Math.floor(this.timeWaitingClient / 3600);
+    this.mm = Math.floor((this.timeWaitingClient - this.timeWaitingClient / 3600) / 60);
+    this.ss = this.timeWaitingClient - this.hh * 3600 - this.mm * 60;
 
     if (this.hh < 10) {
       this.hh = "0" + this.hh;
@@ -214,11 +214,8 @@ export class OrderPage implements OnInit {
       this.ss = "0" + this.ss;
     }
 
-    this.timerTime = this.hh  + ':' + this.mm + ':' + this.ss;
-
+    this.timerTime = this.hh + ":" + this.mm + ":" + this.ss;
   }
-
-
 
   ngOnInit() {
     this.initOrder();
@@ -878,6 +875,7 @@ export class OrderPage implements OnInit {
     this.commentText = details.data.commentText;
     this.cardNums = details.data.cardNums;
     this.order.waitingMinutes = details.data.waitingMinutes;
+    this.timeWaitingClient = details.data.timeWaitingClient;;;;
     if (details.data) {
       this.doneOrder();
     }
@@ -907,7 +905,7 @@ export class OrderPage implements OnInit {
       this.cardNums = details.data.cardNums;
       this.order.goods = details.data.goods;
       this.order.waitingMinutes = details.data.waitingMinutes;
-
+      this.timeWaitingClient = details.data.timeWaitingClient;;;;
       this.setQuants();
       this.doneOrder();
     }
