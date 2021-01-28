@@ -1,0 +1,26 @@
+<div class="ps-timer">
+  <div class="ps-timer__title">Время ожидания клиента, мин</div>
+  <div class="ps-timer__controls">
+    <ion-input
+      class="ps-timer__input"
+      type="number"
+      [(ngModel)]="totalMinutes"
+      (ngModelChange)="totalMinutesChange.emit(totalMinutes)"
+      [disabled]="isRunning"
+    ></ion-input>
+    <div class="ps-timer__btns">
+      <button
+        class="ps-timer__btn"
+        (click)="toggleTimer()"
+        [ngClass]="
+          isRunning ? 'ps-timer__btn--danger' : 'ps-timer__btn--success'
+        "
+      >
+        {{ isRunning ? "Стоп" : "Старт" }}
+      </button>
+    </div>
+  </div>
+  <div class="ps-timer--watch" *ngIf="isRunning">
+    {{ minutes }}<span>мин</span> {{ seconds }}<span>сек</span>
+  </div>
+</div>

@@ -3,37 +3,36 @@ import {
   state,
   style,
   transition,
-  trigger
-} from '@angular/animations';
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IntroJsService } from '@esfaenza/ngx-introjs';
-import { CallNumber } from '@ionic-native/call-number/ngx';
-import { FirebaseX } from '@ionic-native/firebase-x/ngx';
-import { Network } from '@ionic-native/network/ngx';
-import { ModalController } from '@ionic/angular';
-import { Storage } from '@ionic/storage';
-import { CacheService } from 'ionic-cache';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { Meta } from 'src/app/interfaces/meta';
-import { Order } from 'src/app/interfaces/order';
-import { DeliveredComponent } from '../../components/delivered/delivered.component';
-import { NotDeliveredComponent } from '../../components/not-delivered/not-delivered.component';
-import { PartDeliveredComponent } from '../../components/part-delivered/part-delivered.component';
-import { Reason } from '../../interfaces/reason';
-import { Statuses } from '../../interfaces/statuses';
-import { AuthService } from '../../services/auth.service';
-import { CourierService } from '../../services/courier.service';
-import { SettingsService } from '../../services/settings.service';
-import { StateService } from '../../services/state.service';
-import { SysService } from '../../services/sys.service';
-import { MapService } from '../../services/sys/map.service';
-import { OrderService } from '../../services/sys/order.service';
-import { DrawPage } from '../draw/draw.page';
-import { DataService } from './../../services/sys/data.service';
-import { interval } from "rxjs";
+  trigger,
+} from "@angular/animations";
+import { HttpClient } from "@angular/common/http";
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { IntroJsService } from "@esfaenza/ngx-introjs";
+import { CallNumber } from "@ionic-native/call-number/ngx";
+import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+import { Network } from "@ionic-native/network/ngx";
+import { ModalController } from "@ionic/angular";
+import { Storage } from "@ionic/storage";
+import { CacheService } from "ionic-cache";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+import { Meta } from "src/app/interfaces/meta";
+import { Order } from "src/app/interfaces/order";
+import { DeliveredComponent } from "../../components/delivered/delivered.component";
+import { NotDeliveredComponent } from "../../components/not-delivered/not-delivered.component";
+import { PartDeliveredComponent } from "../../components/part-delivered/part-delivered.component";
+import { Reason } from "../../interfaces/reason";
+import { Statuses } from "../../interfaces/statuses";
+import { AuthService } from "../../services/auth.service";
+import { CourierService } from "../../services/courier.service";
+import { SettingsService } from "../../services/settings.service";
+import { StateService } from "../../services/state.service";
+import { SysService } from "../../services/sys.service";
+import { MapService } from "../../services/sys/map.service";
+import { OrderService } from "../../services/sys/order.service";
+import { DrawPage } from "../draw/draw.page";
+import { DataService } from "./../../services/sys/data.service";
 
 @Component({
   selector: "app-order",
@@ -139,6 +138,10 @@ export class OrderPage implements OnInit {
   };
   public waitingMinutes: number;
 
+  waitingMinutesChanged(val: number) {
+    this.waitingMinutes = val;
+  }
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -174,48 +177,7 @@ export class OrderPage implements OnInit {
       .setOption("scrollTo", "element");
   }
 
-  public play: boolean = false;
   public timeWaitingClient: number = 0;
-  public ss: any = 0;
-  public mm: any = 0;
-  public hh: any = 0;
-  public timerID: any = 0;
-  public timerTime: any = 0;
-
-  public startTimer() {
-    this.play = true;
-    this.timeWaitingClient = 0;
-    this.timerID = setInterval(() => {
-      this.timeWaitingClient++;
-      this.doTime();
-      console.log(this.timeWaitingClient);
-    }, 1000);
-  }
-
-  public pauseTimer() {
-    this.play = false;
-    clearTimeout(this.timerID);
-    const timeWatch: number = this.timeWaitingClient;
-    console.log(timeWatch);
-  }
-
-  doTime() {
-    this.hh = Math.floor(this.timeWaitingClient / 3600);
-    this.mm = Math.floor((this.timeWaitingClient - this.timeWaitingClient / 3600) / 60);
-    this.ss = this.timeWaitingClient - this.hh * 3600 - this.mm * 60;
-
-    if (this.hh < 10) {
-      this.hh = "0" + this.hh;
-    }
-    if (this.mm < 10) {
-      this.mm = "0" + this.mm;
-    }
-    if (this.ss < 10) {
-      this.ss = "0" + this.ss;
-    }
-
-    this.timerTime = this.hh + ":" + this.mm + ":" + this.ss;
-  }
 
   ngOnInit() {
     this.initOrder();
@@ -836,6 +798,9 @@ export class OrderPage implements OnInit {
     });
   }
 
+  /**
+   * Запускается по клику на кнопку [ Не доставлено ]
+   */
   async presentNotDeliveredModal() {
     const modal = await this.modalController.create({
       component: NotDeliveredComponent,
@@ -854,6 +819,9 @@ export class OrderPage implements OnInit {
     details.data && this.doneOrder();
   }
 
+  /**
+   * Запускается по клику на кнопку [ Доставлено ]
+   */
   async presentDeliveredModal() {
     const modal = await this.modalController.create({
       component: DeliveredComponent,
@@ -862,6 +830,7 @@ export class OrderPage implements OnInit {
         goods: this.goods,
         pay_type: this.order.pay_type,
         pay_type_change_allowed: this.order.pay_type_change_allowed,
+        waitingMinutes: this.waitingMinutes,
       },
       showBackdrop: true,
     });
@@ -875,12 +844,15 @@ export class OrderPage implements OnInit {
     this.commentText = details.data.commentText;
     this.cardNums = details.data.cardNums;
     this.order.waitingMinutes = details.data.waitingMinutes;
-    this.timeWaitingClient = details.data.timeWaitingClient;;;;
+    this.timeWaitingClient = details.data.timeWaitingClient;
     if (details.data) {
       this.doneOrder();
     }
   }
 
+  /**
+   * Запускается по клику на кнопку [ Частично доставлено ]
+   */
   public async presentPartDeliveredModal(orderId = this.order.id) {
     const modal = await this.modalController.create({
       component: PartDeliveredComponent,
@@ -905,7 +877,7 @@ export class OrderPage implements OnInit {
       this.cardNums = details.data.cardNums;
       this.order.goods = details.data.goods;
       this.order.waitingMinutes = details.data.waitingMinutes;
-      this.timeWaitingClient = details.data.timeWaitingClient;;;;
+      this.timeWaitingClient = details.data.timeWaitingClient;
       this.setQuants();
       this.doneOrder();
     }

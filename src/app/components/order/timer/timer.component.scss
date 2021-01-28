@@ -1,0 +1,58 @@
+.ps-timer{
+    padding: 22px 15px 15px;
+    &__title{
+        font-family: Roboto;
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    &__controls{
+        display: flex;
+        margin-bottom: 10px;
+    }
+    &__btns{
+        display: flex;
+
+    }
+    &__input{
+        border: 1px solid #D6CFCF;
+        box-sizing: border-box;
+        border-radius: 2px;
+        height: 30px;
+        color: #585454;
+        font-size: 14px;
+        padding: 0 8px;
+        flex: 1;
+        margin-right: 17px;
+        &:disabled{
+            background: #EEEEEE;
+        }
+    }
+    &__btn{
+        font-family: Roboto;
+        border: 0;
+        border-radius: 2px;
+        font-size: 12px;
+        font-weight: 500;
+        height: 30px;
+        min-width: 100px;
+        &--success{
+            color: #3A543B;
+            background: #D7F3DD;
+        }
+        &--danger{
+            background: #FFCCDB;
+            color: #D12437;
+        }
+    }
+    &--watch{
+        font-size: 48px;
+        color: #585454;
+        text-align: center;
+        border: 1px solid #E5F0F4;
+        border-width: 1px 0;
+        span{
+            font-size: 19px;
+        }
+    }
+}

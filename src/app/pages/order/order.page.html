@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title *ngIf='order'>{{order.client_id}}</ion-title>
+    <ion-title *ngIf="order">{{order.client_id}}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="showHelp()">
         <ion-icon slot="icon-only" name="help-circle-outline"></ion-icon>
@@ -16,31 +16,27 @@
   <ion-list>
     <ion-item>
       <ion-label>
-        <div class='flex'>
-          <img src="../../../assets/a-b.svg">
-          <div class='addresses'>
+        <div class="flex">
+          <img src="../../../assets/a-b.svg" />
+          <div class="addresses">
             Адрес отправителя:
             <p>{{order.company_address}}</p>
             Адрес получателя:
             <p>{{order.client_address}}</p>
           </div>
         </div>
-        <div class='client-id'>
-          Шифр: <span>{{order.client_id}} </span>
-        </div>
+        <div class="client-id">Шифр: <span>{{order.client_id}} </span></div>
       </ion-label>
     </ion-item>
-    <ion-item class='datetime'>
+    <ion-item class="datetime">
       <ion-label>
         <div>
           Дата доставки:
           <p>
-            <span>
-              {{order.datetime_to | date: 'd.MM.yyyy'}}
-            </span>
+            <span> {{order.datetime_to | date: 'd.MM.yyyy'}} </span>
           </p>
         </div>
-        <div class='time'>
+        <div class="time">
           Время доставки:
           <p>
             После <span>{{order.datetime_from | date: 'H:mm'}}</span> До
@@ -51,63 +47,71 @@
     </ion-item>
     <ion-item>
       <ion-label>
-        <div class='flex main-info'>
+        <div class="flex main-info">
           <div>
-            Имя: <span class='bold'>{{order.client_fio}} </span><br />
-            Компания: <span class='bold'>{{order.client_name}} </span><br />
-            Отдел: <span class='bold'>{{order.Podrazd}} </span>
+            Имя: <span class="bold">{{order.client_fio}} </span><br />
+            Компания: <span class="bold">{{order.client_name}} </span><br />
+            Отдел: <span class="bold">{{order.Podrazd}} </span>
           </div>
           <div>
             Робот прозвон:
-            <div class="st_state" [ngClass]="{
+            <div
+              class="st_state"
+              [ngClass]="{
               'status_done' : order.client_status_id == 1,
               'status_wait' : order.client_status_id == 2,
               'status_fail' : order.client_status_id == 3,
               'status_none' : order.client_status_id == 8,
-              'cl-status-voice' : order.client_status_id == 4 }">
+              'cl-status-voice' : order.client_status_id == 4 }"
+            >
               {{order.client_status}}
             </div>
           </div>
           <div>
             Сумма с клиента:
-            <div class='bold big-red'>
+            <div class="bold big-red">
               {{order.rur?.toLocaleString('ru') || 0}} р.
             </div>
           </div>
           <div>
             Количество / Вес
-            <div class='bold'>{{order.amount}} шт. / {{order.mass}} кг</div>
+            <div class="bold">{{order.amount}} шт. / {{order.mass}} кг</div>
           </div>
         </div>
-        <ion-button class='call' expand='full' fill='solid' (click)="phoneClick('init')" [intro]="introItems"
-          [Order]="1">
+        <ion-button
+          class="call"
+          expand="full"
+          fill="solid"
+          (click)="phoneClick('init')"
+          [intro]="introItems"
+          [Order]="1"
+        >
           Позвонить клиенту
         </ion-button>
       </ion-label>
     </ion-item>
-    <ion-item class='yellow' [ngClass]="{
+    <ion-item
+      class="yellow"
+      [ngClass]="{
       'yellow': order.status_id == 1,
       'pink':order.status_id == 4,
       'green': order.status_id == 5
-  }">
+  }"
+    >
       <ion-label>
-        Статус: <span class='bold'>{{getStatus()}} </span>
+        Статус: <span class="bold">{{getStatus()}} </span>
       </ion-label>
     </ion-item>
     <ion-item *ngIf="order.poruch">
       <ion-label>
         Комментарий к заказу
-        <div class='bold'>
-          {{order.poruch}}
-        </div>
+        <div class="bold">{{order.poruch}}</div>
       </ion-label>
     </ion-item>
     <ion-item>
       <ion-label [@openClose]="openCompany ? 'open' : 'closed'">
         Компания отправитель:
-        <div class='bold'>
-          {{order.company}}
-        </div>
+        <div class="bold">{{order.company}}</div>
         <ion-card id="company-card">
           <ion-item class="ion-activated" *ngIf="order.Cname">
             <ion-label>
@@ -135,59 +139,100 @@
           </ion-item>
         </ion-card>
       </ion-label>
-      <div class="actions-button" (click)="tapBlock()" [intro]="introItems" [Order]="2">
-        <ion-icon src='../../../assets/actions-arrows.svg' [ngClass]="{turned: openCompany == true }"></ion-icon>
+      <div
+        class="actions-button"
+        (click)="tapBlock()"
+        [intro]="introItems"
+        [Order]="2"
+      >
+        <ion-icon
+          src="../../../assets/actions-arrows.svg"
+          [ngClass]="{turned: openCompany == true }"
+        ></ion-icon>
       </div>
     </ion-item>
-    <ion-item id='note-item' [intro]="introItems" [Order]="3">
-      <ion-input placeholder='Введите заметку по заказу' [(ngModel)]="note"></ion-input>
+    <ion-item id="note-item" [intro]="introItems" [Order]="3">
+      <ion-input
+        placeholder="Введите заметку по заказу"
+        [(ngModel)]="note"
+      ></ion-input>
       <ion-button (click)="saveNote()">
         <ion-icon slot="icon-only" name="save"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>
-  <div id='navigate-buttons'>
-    <ion-button expand="block" fill="solid" shape="round" (click)="intentStart()" class='action' [intro]="introItems"
-      [Order]="4">
+  <div id="navigate-buttons">
+    <ion-button
+      expand="block"
+      fill="solid"
+      shape="round"
+      (click)="intentStart()"
+      class="action"
+      [intro]="introItems"
+      [Order]="4"
+    >
       Открыть в навигаторе
     </ion-button>
-    <ion-button expand="block" fill="solid" shape="round" (click)="showRoute(order)" class='action' [intro]="introItems"
-      [Order]="5">
+    <ion-button
+      expand="block"
+      fill="solid"
+      shape="round"
+      (click)="showRoute(order)"
+      class="action"
+      [intro]="introItems"
+      [Order]="5"
+    >
       Показать на карте
     </ion-button>
   </div>
 
-  <div class='order__taimer'>
-    <p class='order__taimer-title'>Время ожидания клиента, мин</p>
-    <div class='order__taimer-table'>
-      <p class='order__taimer-time'>{{timerTime}}</p>
-      <ion-button class='order__taimer-input' type='checkbox' (click)='startTimer()' *ngIf='!play'>Старт</ion-button>
-      <ion-button class='order__taimer-input  order__taimer-input_stop' type='checkbox' (click)='pauseTimer()' *ngIf='play'>Стоп</ion-button>
-    </div>
-    <p class='order__taimer-stopwatch' *ngIf='play'>{{timerTime}}</p>
-  </div>
+  <app-timer (totalMinutesChange)="waitingMinutesChanged($event)"></app-timer>
 
-
-  <div id='done-buttons' *ngIf="!(status_id == 5 || status_id == 6)" [intro]="introItems" [Order]="6">
-    <ion-button expand="full" fill="solid" shape="round" id='light-purple-button' class='action'
-      (click)="selectStatus(4); presentNotDeliveredModal()">
+  <div
+    id="done-buttons"
+    *ngIf="!(status_id == 5 || status_id == 6)"
+    [intro]="introItems"
+    [Order]="6"
+  >
+    <ion-button
+      expand="full"
+      fill="solid"
+      shape="round"
+      id="light-purple-button"
+      class="action"
+      (click)="selectStatus(4); presentNotDeliveredModal()"
+    >
       <ion-icon slot="start" name="close"></ion-icon>
       Не доставлено
     </ion-button>
-    <ion-button expand="full" fill="solid" shape="round" class='action light-blue-button'
-      (click)="selectStatus(6); presentPartDeliveredModal()">
-      <ion-icon slot="start" src='../../../assets/pie-chart.svg'></ion-icon>
+    <ion-button
+      expand="full"
+      fill="solid"
+      shape="round"
+      class="action light-blue-button"
+      (click)="selectStatus(6); presentPartDeliveredModal()"
+    >
+      <ion-icon slot="start" src="../../../assets/pie-chart.svg"></ion-icon>
       Частично доставлено
     </ion-button>
-    <ion-button expand="full" fill="solid" shape="round" class='action light-green-button'
-      (click)="selectStatus(5); presentDeliveredModal()">
+    <ion-button
+      expand="full"
+      fill="solid"
+      shape="round"
+      class="action light-green-button"
+      (click)="selectStatus(5); presentDeliveredModal()"
+    >
       <ion-icon slot="start" name="checkmark-done"></ion-icon>
       Доставлено
     </ion-button>
   </div>
   <div id="call-window" *ngIf="callWindow">
     <div class="cw-body">
-      <i-feather name="x-square" (click)="phoneClick('init')" size="large"></i-feather>
+      <i-feather
+        name="x-square"
+        (click)="phoneClick('init')"
+        size="large"
+      ></i-feather>
       <ion-list *ngIf="orderPhones.length > 1">
         <ion-radio-group name="selectedPhone" [(ngModel)]="selectedPhone">
           <ion-list-header>
@@ -199,12 +244,16 @@
           </ion-item>
         </ion-radio-group>
       </ion-list>
-      <button (click)="phoneClick('phone')"
-        *ngIf="settings.rules.phoneMode == 'robotPhone' || settings.rules.phoneMode == 'phone' ">
+      <button
+        (click)="phoneClick('phone')"
+        *ngIf="settings.rules.phoneMode == 'robotPhone' || settings.rules.phoneMode == 'phone' "
+      >
         Позвонить со своего телефона
       </button>
-      <button (click)="phoneClick('operator')"
-        *ngIf="settings.rules.phoneMode == 'robotPhone' || settings.rules.phoneMode == 'robot' ">
+      <button
+        (click)="phoneClick('operator')"
+        *ngIf="settings.rules.phoneMode == 'robotPhone' || settings.rules.phoneMode == 'robot' "
+      >
         Позвонить через ip-шлюз
       </button>
     </div>

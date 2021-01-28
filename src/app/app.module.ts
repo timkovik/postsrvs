@@ -40,6 +40,8 @@ import { LongPressDirective } from './directives/long-press.directive';
 import { IconsModule } from './icons/icons.module';
 import { ErrorIntercept } from './interceptors/error.interceptor';
 import { HttpErrorInterceptor } from './interceptors/http.interceptor';
+
+
 registerLocaleData(localeRu, 'ru',);
 @NgModule({
   declarations: [
@@ -64,17 +66,17 @@ registerLocaleData(localeRu, 'ru',);
     BrowserAnimationsModule,
     HttpClientModule,
     IonicModule.forRoot({
-      mode: 'md',
+      mode: "md",
     }),
     AppRoutingModule,
     NgxMaskModule.forRoot(),
     ScrollingModule,
     IonicStorageModule.forRoot({
-      name: '__postsrvsDB',
-      driverOrder: ['indexeddb', 'sqlite', 'websql'],
+      name: "__postsrvsDB",
+      driverOrder: ["indexeddb", "sqlite", "websql"],
     }),
     CacheModule.forRoot(),
-    ServiceWorkerModule.register('ngsw-worker.js'),
+    ServiceWorkerModule.register("ngsw-worker.js"),
   ],
   providers: [
     FirebaseX,
@@ -89,15 +91,15 @@ registerLocaleData(localeRu, 'ru',);
     Camera,
     CallNumber,
     Network,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy, },
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,
       multi: true,
     },
-    { provide: LOCALE_ID, useFactory: () => 'ru', },
-    { provide: ErrorHandler, useClass: ErrorIntercept, },
+    { provide: LOCALE_ID, useFactory: () => "ru" },
+    { provide: ErrorHandler, useClass: ErrorIntercept },
   ],
-  bootstrap: [AppComponent,],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

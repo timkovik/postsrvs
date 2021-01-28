@@ -6,6 +6,8 @@ import { IntroJsModule } from '@esfaenza/ngx-introjs';
 import { IonicModule } from '@ionic/angular';
 import { IconsModule } from '../../icons/icons.module';
 import { OrderPage } from './order.page';
+import { TimerComponent } from "../../components/order/timer/timer.component";
+// import { PipesModule } from "../../pipes/pipes.module";
 
 const routes: Routes = [
   {
@@ -21,8 +23,9 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
-    IntroJsModule
+    IntroJsModule,
+
   ],
-  declarations: [OrderPage]
+  declarations: [OrderPage, TimerComponent],
 })
-export class OrderPageModule { }
+export class OrderPageModule {}

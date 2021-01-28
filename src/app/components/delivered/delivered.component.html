@@ -1,10 +1,15 @@
 <div class="ion-padding">
   <h1>Доставлено <a (click)="dismiss('cancel')">Закрыть</a></h1>
   <ion-list>
-    <app-client-receipt #receipt [pay_type_change_allowed]="pay_type_change_allowed" [pay_type]="pay_type">
+    <app-client-receipt
+      #receipt
+      [pay_type_change_allowed]="pay_type_change_allowed"
+      [pay_type]="pay_type"
+      [waitingMinutes]="waitingMinutes"
+    >
     </app-client-receipt>
 
-    <ion-item class='comment input' lines='none'>
+    <ion-item class="comment input" lines="none">
       <ion-label position="stacked">Комментарий</ion-label>
       <ion-textarea [(ngModel)]="commentText"></ion-textarea>
     </ion-item>
@@ -13,12 +18,18 @@
         <app-goods-table [goods]="goods"></app-goods-table>
       </ion-label>
     </ion-item>
-    <ion-item>
-
-    </ion-item>
+    <ion-item> </ion-item>
   </ion-list>
-  <ion-button [disabled]="!cardNums && selectedPayment == '2'" expand="full" fill="solid" shape="round"
-    class='action light-green-button' (click)="dismiss()" [intro]="IntroItems" [Order]="5">
+  <ion-button
+    [disabled]="!cardNums && selectedPayment == '2'"
+    expand="full"
+    fill="solid"
+    shape="round"
+    class="action light-green-button"
+    (click)="dismiss()"
+    [intro]="IntroItems"
+    [Order]="5"
+  >
     Доставлено
   </ion-button>
 </div>
