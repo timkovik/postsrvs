@@ -1,24 +1,24 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { FirebaseX } from '@ionic-native/firebase-x/ngx';
-import { Network } from '@ionic-native/network/ngx';
-import { CacheService } from 'ionic-cache';
-import { EMPTY, from, Observable, Subject } from 'rxjs';
-import { catchError, retry, takeUntil, tap } from 'rxjs/operators';
-import { Order } from '../interfaces/order';
-import { PostData } from '../interfaces/post-data';
-import { Response } from '../interfaces/response';
-import { AuthService } from '../services/auth.service';
-import { StateService } from '../services/state.service';
-import { SysService } from '../services/sys.service';
-import { SettingsService } from './settings.service';
-import { SysCourierService } from './sys/courier.service';
-import { DataService } from './sys/data.service';
-import { LoggerService } from './sys/logger.service';
-import { MapService } from './sys/map.service';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+import { Network } from "@ionic-native/network/ngx";
+import { CacheService } from "ionic-cache";
+import { EMPTY, from, Observable, Subject } from "rxjs";
+import { catchError, retry, takeUntil, tap } from "rxjs/operators";
+import { Order } from "../interfaces/order";
+import { PostData } from "../interfaces/post-data";
+import { Response } from "../interfaces/response";
+import { AuthService } from "../services/auth.service";
+import { StateService } from "../services/state.service";
+import { SysService } from "../services/sys.service";
+import { SettingsService } from "./settings.service";
+import { SysCourierService } from "./sys/courier.service";
+import { DataService } from "./sys/data.service";
+import { LoggerService } from "./sys/logger.service";
+import { MapService } from "./sys/map.service";
 declare let ymaps: any;
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class CourierService {
   public ordersInfo: Array<any> = [];
@@ -27,7 +27,7 @@ export class CourierService {
     g_done: 0,
     g_process: 0,
     g_fail: 0,
-    all: 0
+    all: 0,
   };
 
   constructor(
@@ -42,51 +42,52 @@ export class CourierService {
     private logger: LoggerService,
     private map: MapService,
     private data: DataService,
-    private network: Network,
+    private network: Network
   ) {
     // при выходе из приложения возвращаем начальное состояние
     var self = this;
-    this.state$.interval_1ss.pipe(takeUntil(this.state$.stop$)).subscribe(() => {
-      const old_val = self.state$.load_lvl.getValue();
-      self.state$.load_lvl.next(old_val + 1.7);
-    });
+    this.state$.interval_1ss
+      .pipe(takeUntil(this.state$.stop$))
+      .subscribe(() => {
+        const old_val = self.state$.load_lvl.getValue();
+        self.state$.load_lvl.next(old_val + 1.7);
+      });
 
     var self = this;
     // обновляем заказы по запросу
-    this.state$.updateWayInfo.pipe(takeUntil(this.state$.stop$)).subscribe(() => {
-      self.updateOrders();
-    });
+    this.state$.updateWayInfo
+      .pipe(takeUntil(this.state$.stop$))
+      .subscribe(() => {
+        self.updateOrders();
+      });
 
     this.state$.g_state.subscribe((state) => {
-      if (state == 'login') {
+      if (state == "login") {
         self.initOrders();
         self.updateOrders();
       }
     });
 
     this.state$.init_params_state.subscribe((state) => {
-      if (state == 'init_geo_done') {
+      if (state == "init_geo_done") {
         self.initOrders();
       }
     });
 
-    this.state$.status_changed.pipe(takeUntil(this.state$.stop$)).subscribe(() => {
-      self.state$.state.next('init');
-    });
+    this.state$.status_changed
+      .pipe(takeUntil(this.state$.stop$))
+      .subscribe(() => {
+        self.state$.state.next("init");
+      });
   }
 
   public updateOrders() {
-    this.state$.state.next('init');
+    this.state$.state.next("init");
   }
 
-  ngOnDestroy() {
+  ngOnDestroy() {}
 
-  }
-
-  ngOnInit() {
-
-  }
-
+  ngOnInit() {}
 
   // Собираем необходимую инфу по заказам
   public initOrders() {
@@ -99,50 +100,60 @@ export class CourierService {
     // Костыль для мгновенного отображения листина в обход ожидания статусов по апи
     this.initStatuses();
     if (!this.state$.courier_init) {
-      this.state$.state.pipe(takeUntil(this.state$.stop$)).subscribe((state) => {
-        console.log('sys:: state', JSON.stringify(state));
-        switch (state) {
-          case 'init':
-            if (this.auth.getDefaultRouteBuilding() == '1') {
-              console.log('sys:: дефолтное построение маршрута ', this.auth.getDefaultRouteBuilding());
-              self.getWay();
-            } else {
-              self.state$.state.next('way_init');
-            }
-
-            break;
-          case 'way_init':
-            self.getOrders().subscribe((data: Response) => {
-              console.log('sys:: Данные о заказах', data);
-              if ((data.success == 'true') && (data.reason !== 'нет заказов')) {
-                self.state$.orders.next(data.orders);
-                self.state$.orders_data = data.orders;
-                self.state$.state.next('orders_init');
-                this.state$.confirmed = true;
-                data.orders.forEach((order) => {
-                  if (order.confirm == '0') {
-                    self.state$.confirmed = false;
-                  }
-                });
-              } else if (data.reason == 'empty' || data.reason == 'нет заказов') {
-                console.log('Массив данных о заказах пуст');
-                const rmpt: [] = [];
-                self.state$.orders.next(rmpt);
-                self.state$.orders_data = rmpt;
-                self.state$.state.next('orders_init');
-                this.state$.confirmed = true;
+      this.state$.state
+        .pipe(takeUntil(this.state$.stop$))
+        .subscribe((state) => {
+          console.log("sys:: state", JSON.stringify(state));
+          switch (state) {
+            case "init":
+              if (this.auth.getDefaultRouteBuilding() == "1") {
+                console.log(
+                  "sys:: дефолтное построение маршрута ",
+                  this.auth.getDefaultRouteBuilding()
+                );
+                self.getWay();
+              } else {
+                self.state$.state.next("way_init");
               }
-            },
-              (error) => {
-                console.error('sys:: Ошибка получения данных о заказах!');
-              });
-            break;
-        }
-      });
+
+              break;
+            case "way_init":
+              self.getOrders().subscribe(
+                (data: Response) => {
+                  console.log("sys:: Данные о заказах", data);
+                  if (data.success == "true" && data.reason !== "нет заказов") {
+                    self.state$.orders.next(data.orders);
+                    self.state$.orders_data = data.orders;
+                    self.state$.state.next("orders_init");
+                    this.state$.confirmed = true;
+                    data.orders.forEach((order) => {
+                      if (order.confirm == "0") {
+                        self.state$.confirmed = false;
+                      }
+                    });
+                  } else if (
+                    data.reason == "empty" ||
+                    data.reason == "нет заказов"
+                  ) {
+                    console.log("Массив данных о заказах пуст");
+                    const rmpt: [] = [];
+                    self.state$.orders.next(rmpt);
+                    self.state$.orders_data = rmpt;
+                    self.state$.state.next("orders_init");
+                    this.state$.confirmed = true;
+                  }
+                },
+                (error) => {
+                  console.error("sys:: Ошибка получения данных о заказах!");
+                }
+              );
+              break;
+          }
+        });
       this.state$.courier_init = true;
     }
 
-    this.state$.state.next('init');
+    this.state$.state.next("init");
     this.checkWay();
   }
 
@@ -150,62 +161,66 @@ export class CourierService {
   public checkWay() {
     const self = this;
     if (!this.state$.check_state) {
-      this.state$.interval_3.pipe(takeUntil(this.state$.stop$)).subscribe(() => {
-        self.state$.load_lvl.next(0);
-        self.state$.state.next('init');
-      });
+      this.state$.interval_3
+        .pipe(takeUntil(this.state$.stop$))
+        .subscribe(() => {
+          self.state$.load_lvl.next(0);
+          self.state$.state.next("init");
+        });
       this.state$.check_state = true;
     }
   }
-
 
   /* Запрос списка заказов курьера
     В зависимости от режима либо запоминаем данные в сервисе,
     либо сравниваем с маршрутом созданным курьером(manualWay)
   */
   public getWay() {
-    console.log('sys::getWay()');
+    console.log("sys::getWay()");
     const routingMode = this.auth.getRoutingMode();
     let mode: string;
-    if (routingMode !== 'standart') {
-      mode = '1';
+    if (routingMode !== "standart") {
+      mode = "1";
     } else {
-      mode = '0';
+      mode = "0";
     }
-    const url = 'orders',
+    const url = "orders",
       data = {
-        action: 'getWay',
+        action: "getWay",
         lt: this.state$.position.getValue().lt,
         lg: this.state$.position.getValue().lg,
         auto: mode,
-        mode: ''
+        mode: "",
       },
       app_mode = this.auth.getMode();
-    if ((app_mode == 'fullHand' || app_mode == 'hand') || this.state$.manual_route) {
-      data.mode = 'manual';
+    if (
+      app_mode == "fullHand" ||
+      app_mode == "hand" ||
+      this.state$.manual_route
+    ) {
+      data.mode = "manual";
     } else {
-      data.mode = 'auto';
+      data.mode = "auto";
     }
     const resp: Subject<any> = new Subject(),
       self = this;
 
     this.auth.sendPost(url, data).subscribe((orders: any) => {
-      if (orders.success == 'true') {
-        self.state$.manual_route = orders.mode == 'manual';
+      if (orders.success == "true") {
+        self.state$.manual_route = orders.mode == "manual";
         self.state$.way.next(orders.orders);
-        self.state$.state.next('way_init');
-      } else if (orders.reason == 'empty') {
+        self.state$.state.next("way_init");
+      } else if (orders.reason == "empty") {
         self.state$.manual_route = false;
         const emt: [] = [];
         self.state$.way.next(emt);
-        self.state$.state.next('way_init');
+        self.state$.state.next("way_init");
       }
     });
   }
 
-
   public getOrders(): Observable<any> {
-    const url = 'orders';
+    const url = "orders";
     let ids = [],
       way = this.ordersInfo;
     this.ordersShortData.subscribe((data) => {
@@ -222,21 +237,19 @@ export class CourierService {
 
     const routingAuto = this.auth.getRoutingMode();
     let auto: string;
-    if (routingAuto !== 'standart') {
-      auto = '1';
+    if (routingAuto !== "standart") {
+      auto = "1";
     } else {
-      auto = '0';
+      auto = "0";
     }
 
-
     const data = {
-      action: 'getOrders',
-      orders_id: ids
+      action: "getOrders",
+      orders_id: ids,
     };
 
     return this.auth.sendPost(url, data);
   }
-
 
   // Запрос основных данных курьера
   // @sync_id - ид курьера
@@ -244,14 +257,16 @@ export class CourierService {
   // @CL - код филлиала
   public getBalance(sync_id: number, more = 0) {
     this.firebase.setUserId(String(sync_id));
-    const CL = this.settings.get('cl'),
-      url = `${this.sys.proxy}https://terminal.vestovoy.ru/info/stat.php?cid=${sync_id}&more=${more}&CL=${CL}`;
+    const uuid = this.sys.getUuid();
+
+    const CL = this.settings.get("cl"),
+      url = `${this.sys.proxy}https://terminal.vestovoy.ru/info/stat.php?cid=${sync_id}&more=${more}&uuid=${uuid}&CL=${CL}`;
     return this.http.get(url);
   }
 
   public getStatus(order: Order) {
     if (order.status_id == 1) {
-      return 'Доставляется';
+      return "Доставляется";
     }
     const statuses = this.state$.statuses.getValue();
     for (let i = 0; i < statuses.length; i++) {
@@ -262,12 +277,23 @@ export class CourierService {
     }
   }
 
-
-  public changeStatus(status = '', id = '', comment = '', reason = '', goods = '', payment = '', new_plan_date = '', check = '', recognizedCheckData: string = null, cardNums?: string, waitingMinutes?: number) {
-    const url = 'orders',
-      draw = localStorage.getItem('drawImg');
+  public changeStatus(
+    status = "",
+    id = "",
+    comment = "",
+    reason = "",
+    goods = "",
+    payment = "",
+    new_plan_date = "",
+    check = "",
+    recognizedCheckData: string = null,
+    cardNums?: string,
+    waitingMinutes?: number
+  ) {
+    const url = "orders",
+      draw = localStorage.getItem("drawImg");
     const data = {
-      action: 'changedStatus',
+      action: "changedStatus",
       status,
       id,
       comment,
@@ -277,43 +303,51 @@ export class CourierService {
       new_plam_date: new_plan_date,
       check,
       recognizedCheckData,
-      sign: '',
+      sign: "",
       cardNums,
-      waitingMinutes
+      waitingMinutes,
     };
     if (draw) data.sign = draw;
-    if (this.network.type === 'none') {
-      this.cache.getItem<Array<{ url: string, data: PostData }>>('syncRequests').then((req) => {
-        const requests = req ?? [];
-        requests.push({ url, data });
-        this.cache.saveItem('syncRequests', requests, 'delayedCalls');
-      });
-      return from([{ success: 'true' }]);
+    if (this.network.type === "none") {
+      this.cache
+        .getItem<Array<{ url: string; data: PostData }>>("syncRequests")
+        .then((req) => {
+          const requests = req ?? [];
+          requests.push({ url, data });
+          this.cache.saveItem("syncRequests", requests, "delayedCalls");
+        });
+      return from([{ success: "true" }]);
     }
     const iD = Number(this.auth.getUserId());
-    if (this.settings.rules.appMode.includes('auto')) {
-      this.sysCourier.sendStartRoute(iD, '1').then((req) => {
+    if (this.settings.rules.appMode.includes("auto")) {
+      this.sysCourier.sendStartRoute(iD, "1").then((req) => {
         req.subscribe((resp) => {
           if (resp.success) {
-            this.logger.debug('Стукнуто на start_route');
+            this.logger.debug("Стукнуто на start_route");
             this.map.getMyLocation().then((location) => {
-              resp.success && this.map.getWay({ lt: location.latLng.lat, lg: location.latLng.lng }).subscribe((orders) => {
-                this.data.orders.next(orders);
-              });
+              resp.success &&
+                this.map
+                  .getWay({ lt: location.latLng.lat, lg: location.latLng.lng })
+                  .subscribe((orders) => {
+                    this.data.orders.next(orders);
+                  });
             });
           } else {
-            this.sys.presentToast('Попробуйте еще раз', 'danger', 'Ошибка');
+            this.sys.presentToast("Попробуйте еще раз", "danger", "Ошибка");
           }
         });
       });
     }
-    return this.auth.sendPost(url, data).pipe(retry(5), tap((resp) => {
-      if (!resp.success) {
-        this.sys.presentToast('Попробуйте еще раз', 'danger', 'Ошибка');
-      }
-    }), catchError(() => EMPTY));
+    return this.auth.sendPost(url, data).pipe(
+      retry(5),
+      tap((resp) => {
+        if (!resp.success) {
+          this.sys.presentToast("Попробуйте еще раз", "danger", "Ошибка");
+        }
+      }),
+      catchError(() => EMPTY)
+    );
   }
-
 
   /**
    * Ищет заказ в милевском(через 4 круга ада)
@@ -323,16 +357,16 @@ export class CourierService {
    * @param code //штрих-код
    */
   public findOrder(code: string) {
-    const url = 'orders',
+    const url = "orders",
       data = {
-        action: 'findOrder',
-        code
+        action: "findOrder",
+        code,
       },
       resp: Subject<any> = new Subject(),
       orders = this.state$.orders_data;
 
     this.auth.sendPost(url, data).subscribe((od) => {
-      if (od.success == 'true') {
+      if (od.success == "true") {
         let n_f = true;
         const orderId = od.order_id;
 
@@ -354,18 +388,18 @@ export class CourierService {
   }
 
   public sumbitOrder(orderId: string) {
-    const url = 'orders',
+    const url = "orders",
       data = {
-        action: 'submitOrder',
-        orderId
+        action: "submitOrder",
+        orderId,
       };
-    console.log('submit_order_data', data);
+    console.log("submit_order_data", data);
     const self = this,
       ret: Subject<any> = new Subject<any>();
 
     this.auth.sendPost(url, data).subscribe((resp: any) => {
-      console.log('submit_order_response', resp);
-      if (resp.success == 'true') {
+      console.log("submit_order_response", resp);
+      if (resp.success == "true") {
         self.state$.updateWayInfo.next(null);
         ret.next(true);
       } else {
@@ -377,25 +411,24 @@ export class CourierService {
     return ret;
   }
 
-
   public count_orders(orders: Order[]) {
-    this.logger.log('Подсчет заказов по статусам');
+    this.logger.log("Подсчет заказов по статусам");
     let g_done = 0,
       g_process = 0,
       g_fail = 0;
     const all = orders.length;
     for (let i = 0; i < orders.length; i += 1) {
       switch (String(orders[i].status_id)) {
-        case '4':
+        case "4":
           g_fail += 1;
           break;
-        case '5':
+        case "5":
           g_done += 1;
           break;
-        case '6':
+        case "6":
           g_done += 1;
           break;
-        case '1':
+        case "1":
           g_process += 1;
           break;
       }
@@ -404,25 +437,29 @@ export class CourierService {
       g_done,
       g_process,
       g_fail,
-      all
+      all,
     };
   }
   public initStatuses() {
-    const statuses = [{ id: 4, status: 'Не доставлено' }, { id: 5, status: 'Доставлено' }, { id: 6, status: 'Частично доставлено' }];
+    const statuses = [
+      { id: 4, status: "Не доставлено" },
+      { id: 5, status: "Доставлено" },
+      { id: 6, status: "Частично доставлено" },
+    ];
     this.state$.statuses.next(statuses);
-    this.state$.s_state.next('status_init');
+    this.state$.s_state.next("status_init");
   }
 
   // Завершение рабочего дня курьера
   public endWork() {
     const url = `${this.sys.proxy}https://mobile.postsrvs.ru/admin/ajax/end_work.php`,
       headers = new HttpHeaders({
-        'Access-Control-Allow-Origin': '*',
-        'Content-type': 'application/json'
+        "Access-Control-Allow-Origin": "*",
+        "Content-type": "application/json",
       }),
       data = {
-        token: 'l;sdfjkhglsoapl[',
-        cId: this.auth.getUserId()
+        token: "l;sdfjkhglsoapl[",
+        cId: this.auth.getUserId(),
       };
 
     return this.http.post(url, data, { headers });

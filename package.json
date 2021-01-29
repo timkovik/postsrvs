@@ -1,7 +1,7 @@
 {
 	"name": "postsrvs.i",
-	"version": "1.37.81",
-	"versionCode": "194",
+	"version": "1.37.82",
+	"versionCode": "195",
 	"author": "Flexcore",
 	"homepage": "https://postsrvs.web.app/",
 	"scripts": {
