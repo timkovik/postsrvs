@@ -452,7 +452,7 @@ export class CourierService {
 
   // Завершение рабочего дня курьера
   public endWork() {
-    const url = `${this.sys.proxy}https://mobile.postsrvs.ru/admin/ajax/end_work.php`,
+    const url = `${this.sys.proxy}https://mobile2.postsrvs.ru/admin/ajax/end_work.php`,
       headers = new HttpHeaders({
         "Access-Control-Allow-Origin": "*",
         "Content-type": "application/json",

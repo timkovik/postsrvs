@@ -1,22 +1,24 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
-import { Device } from '@ionic-native/device/ngx';
-import { AlertController, Platform } from '@ionic/angular';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { NavService } from '../services/nav.service';
-import { SysService } from '../services/sys.service';
-import { SettingsService } from './settings.service';
-import { StateService } from './state.service';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
+import {
+  BarcodeScanner,
+  BarcodeScannerOptions,
+} from "@ionic-native/barcode-scanner/ngx";
+import { Device } from "@ionic-native/device/ngx";
+import { AlertController, Platform } from "@ionic/angular";
+import { BehaviorSubject, Subject } from "rxjs";
+import { NavService } from "../services/nav.service";
+import { SysService } from "../services/sys.service";
+import { SettingsService } from "./settings.service";
+import { StateService } from "./state.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
-
   public user: boolean = false;
-  public auth_state: BehaviorSubject<any> = new BehaviorSubject('not_login');
+  public auth_state: BehaviorSubject<any> = new BehaviorSubject("not_login");
   public stop$: Subject<any> = new Subject(); // останаливает все подписки;
   barcodeScannerOptions: BarcodeScannerOptions;
   public checkState: string = undefined; //Состояние чекнутости на складе
@@ -35,36 +37,31 @@ export class AuthService {
     private alert: AlertController,
     public settings: SettingsService,
     public sys: SysService,
-    private nav_s: NavService,
+    private nav_s: NavService
   ) {
-
     this.barcodeScannerOptions = {
       showTorchButton: true,
-      showFlipCameraButton: true
+      showFlipCameraButton: true,
     };
 
     if (!this.getScanMode()) {
-      this.setScanMode('camera');
+      this.setScanMode("camera");
     }
 
-    this.routingModeAuto = (this.getRoutingMode() == 'standart' ? false : true);
-
-
+    this.routingModeAuto = this.getRoutingMode() == "standart" ? false : true;
   }
 
-
   public checkAuth() {
-    const url = 'orders';
+    const url = "orders";
     const data = {
-
-      action: 'checkAuth'
-    }
+      action: "checkAuth",
+    };
 
     return this.sendPost(url, data);
   }
 
   public setMode(mode: string) {
-    localStorage.setItem('mode', mode);
+    localStorage.setItem("mode", mode);
   }
 
   public getMode() {
@@ -72,22 +69,33 @@ export class AuthService {
   }
 
   public setScanMode(mode: string) {
-    localStorage.setItem('scan_mode', mode);
+    localStorage.setItem("scan_mode", mode);
   }
   //меняет способ сканирования
   public getScanMode(): string {
     return this.settings.rules.scanMode;
   }
-  public sendPost(url: string, data: { uuid?: string, action?: string, barcode?: string, cid?: unknown, lt?: unknown, lg?: unknown, start?: string, stop?: string }) {
-
-    const host = `${this.sys.proxy}https://mobile.postsrvs.ru/mobile/`;
+  public sendPost(
+    url: string,
+    data: {
+      uuid?: string;
+      action?: string;
+      barcode?: string;
+      cid?: unknown;
+      lt?: unknown;
+      lg?: unknown;
+      start?: string;
+      stop?: string;
+    }
+  ) {
+    const host = `${this.sys.proxy}https://mobile2.postsrvs.ru/mobile/`;
 
     url = host + url;
-    data['uuid'] = (this.isDebug ? '6b356755575fce31' : this.getUuid());
+    data["uuid"] = this.isDebug ? "6b356755575fce31" : this.getUuid();
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-type': 'application/json'
-      })
+        "Content-type": "application/json",
+      }),
     };
     const self = this;
     const resp = new Subject<any>();
@@ -95,8 +103,8 @@ export class AuthService {
     this.plt.ready().then(() => {
       self.http.post(url, data, httpOptions).subscribe((data: any) => {
         if (data) {
-          console.log('sys:: data == true, data.success', data.success);
-          if (data.success == 'false' && data.reason == 'not_auth') {
+          console.log("sys:: data == true, data.success", data.success);
+          if (data.success == "false" && data.reason == "not_auth") {
             self.logout();
           } else {
             resp.next(data);
@@ -107,142 +115,136 @@ export class AuthService {
       });
     });
 
-
     return resp;
   }
 
   public getUuid() {
-    if (this.device.platform == 'browser') return 'webapp';
+    if (this.device.platform == "browser") return "webapp";
     return this.device.uuid;
   }
 
   public setUser(id: string) {
-    localStorage.setItem('user', id);
+    localStorage.setItem("user", id);
     this.user = true;
     this.userId = id;
   }
 
   public getUserId() {
-    return localStorage.getItem('user');
+    return localStorage.getItem("user");
   }
 
   public scanData() {
     return this.bScan.scan();
   }
 
-  public login(code: { action: string, barcode: string }) {
-    return this.sendPost('auth', code);
+  public login(code: { action: string; barcode: string }) {
+    return this.sendPost("auth", code);
   }
 
   public initLogin(userId?: string) {
     userId && this.setUser(userId);
-    this.state$.g_state.next('login');
-    this.state$.map_state.next('init');
+    this.state$.g_state.next("login");
+    this.state$.map_state.next("init");
   }
 
-
-
   public logout() {
-
     this.state$.logout();
-    this.router.navigate(['login']);
+    this.router.navigate(["login"]);
     this.nav_s.tabNav.next(0);
-    this.state$.g_state.next('unLogin');
-
+    this.state$.g_state.next("unLogin");
   }
 
   public async showError(err: number) {
     switch (err) {
       case 1:
         const alert = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Ошибка авторизации, повторите попытку позже.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Ошибка авторизации, повторите попытку позже.",
+          buttons: ["OK"],
         });
 
         await alert.present();
         break;
       case 2:
         const alert2 = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Заказ не найден.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Заказ не найден.",
+          buttons: ["OK"],
         });
 
         await alert2.present();
         break;
       case 3:
         const alert3 = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Ошибка отправки запроса, повторите попытку позже.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Ошибка отправки запроса, повторите попытку позже.",
+          buttons: ["OK"],
         });
 
         await alert3.present();
         break;
       case 4:
         const alert4 = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Телефон не зарегистрирован.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Телефон не зарегистрирован.",
+          buttons: ["OK"],
         });
 
         await alert4.present();
         break;
       case 5:
         const alert5 = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Не удалось сменить режим маршрута.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Не удалось сменить режим маршрута.",
+          buttons: ["OK"],
         });
 
         await alert5.present();
         break;
       case 6:
         const alert6 = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Не удалось подтвердить заказ.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Не удалось подтвердить заказ.",
+          buttons: ["OK"],
         });
 
         await alert6.present();
         break;
       case 7:
         const alert7 = await this.alert.create({
-          header: 'Спасибо!',
-          message: 'Отзыв успешно отправлен.',
-          buttons: ['OK']
+          header: "Спасибо!",
+          message: "Отзыв успешно отправлен.",
+          buttons: ["OK"],
         });
 
         await alert7.present();
         break;
       case 8:
         const alert8 = await this.alert.create({
-          header: 'Ошибка',
-          message: 'Не удалось отправить отзыв.',
-          buttons: ['OK']
+          header: "Ошибка",
+          message: "Не удалось отправить отзыв.",
+          buttons: ["OK"],
         });
 
         await alert8.present();
         break;
       case 9:
         const alert9 = await this.alert.create({
-          header: 'Звонок клиенту',
-          message: 'Запрос обрабатывается, вам сейчас позвонят.',
-          buttons: ['OK']
+          header: "Звонок клиенту",
+          message: "Запрос обрабатывается, вам сейчас позвонят.",
+          buttons: ["OK"],
         });
 
         await alert9.present();
         break;
       case 10:
         const alert10 = await this.alert.create({
-          header: 'Настройки сохранены!',
-          buttons: ['OK']
+          header: "Настройки сохранены!",
+          buttons: ["OK"],
         });
 
         await alert10.present();
         break;
-
     }
   }
 
@@ -252,14 +254,15 @@ export class AuthService {
 
   //Сохранение режима построения маршрута по умолчанию
   setDefaultRouteBuilding(defaultRouteBuilding: boolean) {
-    defaultRouteBuilding && localStorage.setItem('defaultRouteBuilding', `${defaultRouteBuilding}`);
+    defaultRouteBuilding &&
+      localStorage.setItem("defaultRouteBuilding", `${defaultRouteBuilding}`);
   }
 
   getDefaultRouteBuilding() {
     return this.settings.rules.autoStartRoute;
   }
   setRoutingMode(auto: string) {
-    auto && localStorage.setItem('auto', `${auto}`);
+    auto && localStorage.setItem("auto", `${auto}`);
   }
   public getRoutingMode() {
     return this.settings.rules.typeRoute;
@@ -267,27 +270,24 @@ export class AuthService {
 
   public check(mode: string) {
     this.bScan.scan().then((scanData) => {
-      console.log('sys:: auth.check() данные qr-кода: ', scanData);
-      const url = `${this.sys.proxy}https://mobile.postsrvs.ru/admin/ajax/wh.php`;
+      console.log("sys:: auth.check() данные qr-кода: ", scanData);
+      const url = `${this.sys.proxy}https://mobile2.postsrvs.ru/admin/ajax/wh.php`;
       const data = {
         cId: this.getUserId(),
-        token: 'l;sdfjkhglsoapl[',
+        token: "l;sdfjkhglsoapl[",
         qr: scanData.text,
-        mode: `check${mode}`
-      }
+        mode: `check${mode}`,
+      };
       const headers = new HttpHeaders({
-        'Access-Control-Allow-Origin': '*',
-        'Content-type': 'application/json'
-      })
+        "Access-Control-Allow-Origin": "*",
+        "Content-type": "application/json",
+      });
       this.http.post(url, data, { headers }).subscribe((data: any) => {
         if (data.success == true) {
           this.checkState = `checked${mode}`;
           localStorage.check = mode;
         }
-      })
-    })
+      });
+    });
   }
-
-
-
 }

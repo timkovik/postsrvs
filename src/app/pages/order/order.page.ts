@@ -584,7 +584,7 @@ export class OrderPage implements OnInit {
   public sendPay() {
     const goods = this.order.goods;
     const quants = this.g_quants;
-    const callback_url = `${this.sys.proxy}https://mobile.postsrvs.ru/mobile/pay_callback.php`;
+    const callback_url = `${this.sys.proxy}https://mobile2.postsrvs.ru/mobile/pay_callback.php`;
     const products = [];
 
     for (const code in quants) {
@@ -757,7 +757,7 @@ export class OrderPage implements OnInit {
         this.sendPayCall();
         this.sys.checkPhoto().then((imageData) => {
           this.checkBase64Image = `data:image/jpeg;base64,${imageData}`;
-          const url = `${this.sys.proxy}https://mobile.postsrvs.ru/mobile/orders`;
+          const url = `${this.sys.proxy}https://mobile2.postsrvs.ru/mobile/orders`;
           const data = {
             action: "save_check_data",
             order_id: this.orderId,

@@ -8,14 +8,14 @@ import {
   GoogleMapOptions,
   GoogleMaps,
   GoogleMapsEvent,
-
-  LocationService, MapTypeId
+  LocationService,
+  MapTypeId,
 } from "@ionic-native/google-maps";
 import { Platform, PopoverController } from "@ionic/angular";
 import { Observable, Subject } from "rxjs";
 import { filter, map, tap } from "rxjs/operators";
-import { Order } from 'src/app/interfaces/order';
-import { Response } from '../../interfaces/response';
+import { Order } from "src/app/interfaces/order";
+import { Response } from "../../interfaces/response";
 import { SysService } from "../sys.service";
 @Injectable({
   providedIn: "root",
@@ -31,11 +31,11 @@ export class MapService {
     private router: Router,
     public viewCtrl: PopoverController,
     private sys: SysService
-  ) { }
+  ) {}
 
   public getWay(coords: { lt: number; lg: number }): Observable<Order[]> {
     const url =
-      "http://mobile.postsrvs.ru:8080/https://mobile.postsrvs.ru/mobile/orders";
+      "http://mobile2.postsrvs.ru:8080/https://mobile2.postsrvs.ru/mobile/orders";
     let data = {
       action: "getWayShort",
       lt: coords?.lt,
@@ -51,10 +51,12 @@ export class MapService {
     };
     return this.http.post<Response>(url, data, httpOptions).pipe(
       tap((resp) => {
-        resp.success || this.sys.presentToast('Попробуйте еще раз', 'danger', 'Ошибка')
+        resp.success ||
+          this.sys.presentToast("Попробуйте еще раз", "danger", "Ошибка");
       }),
-      filter(resp => resp.success as boolean),
-      map(resp => resp.orders));
+      filter((resp) => resp.success as boolean),
+      map((resp) => resp.orders)
+    );
   }
 
   async attachMap(
@@ -154,11 +156,11 @@ export class MapService {
 
   public showRoute(order: Order) {
     const meta = {
-      label: 'showRouteToOrder',
-      order
+      label: "showRouteToOrder",
+      order,
     };
     this.infoUpdated.next(meta);
-    this.router.navigate(['map']);
+    this.router.navigate(["map"]);
   }
 
   public getMyLocation() {

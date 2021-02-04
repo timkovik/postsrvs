@@ -1,21 +1,21 @@
 // Здравый код, растущий рядом с какахами
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
-import { Device } from '@ionic-native/device/ngx';
-import { WebIntent } from '@ionic-native/web-intent/ngx';
-import { AlertController, Platform, ToastController } from '@ionic/angular';
-import { Observable } from 'rxjs';
-import { Order } from '../interfaces/order';
-import { Response } from '../interfaces/response';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Camera, CameraOptions } from "@ionic-native/camera/ngx";
+import { Device } from "@ionic-native/device/ngx";
+import { WebIntent } from "@ionic-native/web-intent/ngx";
+import { AlertController, Platform, ToastController } from "@ionic/angular";
+import { Observable } from "rxjs";
+import { Order } from "../interfaces/order";
+import { Response } from "../interfaces/response";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class SysService {
   public ordersIds: Array<string>;
-  public proxy: string = 'http://mobile.postsrvs.ru:8080/';
-  public orders: Array<Order>
+  public proxy: string = "http://mobile2.postsrvs.ru:8080/";
+  public orders: Array<Order>;
 
   constructor(
     private http: HttpClient,
@@ -24,11 +24,10 @@ export class SysService {
     private camera: Camera,
     private wi: WebIntent,
     private platform: Platform,
-    private alert: AlertController,
-
+    private alert: AlertController
   ) {
-    if (!(this.platform.is('android') && this.platform.is('ios'))) {
-      this.proxy == '';
+    if (!(this.platform.is("android") && this.platform.is("ios"))) {
+      this.proxy == "";
     }
   }
   // Распознавание текста
@@ -45,97 +44,96 @@ export class SysService {
     // await worker.terminate();
     // return text;
     //  }else{
-    return '';
+    return "";
     //  }
   }
   // Получение списка заказов по idшникам
   public getOrders(ids: Array<string>): Observable<Response> {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/mobile/orders`;
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/mobile/orders`;
     const data = {
       uuid: this.getUuid(),
-      action: 'getOrders',
-      orders_id: ids
+      action: "getOrders",
+      orders_id: ids,
     };
-
 
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-type': 'application/json'
-      })
+        "Content-type": "application/json",
+      }),
     };
 
     return this.http.post(url, data, httpOptions);
   }
 
   // Тост
-  async presentToast(message: string, color: string, header: string = '') {
-    console.time('presentToast');
+  async presentToast(message: string, color: string, header: string = "") {
+    console.time("presentToast");
     const toast = await this.toastController.create({
       header,
       message,
       duration: 3000,
       color,
-      position: 'bottom',
+      position: "bottom",
       buttons: [
         {
-          text: 'Х',
-          role: 'cancel',
+          text: "Х",
+          role: "cancel",
           handler: () => {
-            console.log('Cancel clicked');
-          }
-        }
-      ]
+            console.log("Cancel clicked");
+          },
+        },
+      ],
     });
     toast.present();
-    console.timeEnd('presentToast');
+    console.timeEnd("presentToast");
   }
 
   public goToWork(dates: Array<any>) {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/sheduleData.php`;
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/sheduleData.php`;
     const data = {
-      type: 'goToWork',
+      type: "goToWork",
       dates,
       courieriId: localStorage.user,
-      uuid: this.device.uuid
+      uuid: this.device.uuid,
     };
 
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-type': 'application/json'
-      })
+        "Content-type": "application/json",
+      }),
     };
     return this.http.post(url, data, httpOptions);
   }
 
   public getNotWorkRules() {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/sheduleData.php`;
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/sheduleData.php`;
     const data = {
-      type: 'rules',
+      type: "rules",
       courieriId: localStorage.user,
-      uuid: this.device.uuid
+      uuid: this.device.uuid,
     };
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-type': 'application/json'
-      })
+        "Content-type": "application/json",
+      }),
     };
     return this.http.post(url, data, httpOptions);
   }
 
   // Отправка данных о нерабочих днях и причинах
   public stopWork(dates: Array<any>) {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/sheduleData.php`;
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/sheduleData.php`;
     const data = {
-      type: 'stopWork',
+      type: "stopWork",
       dates,
       courieriId: localStorage.user,
-      uuid: this.device.uuid
+      uuid: this.device.uuid,
     };
 
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-type': 'application/json'
-      })
+        "Content-type": "application/json",
+      }),
     };
     return this.http.post(url, data, httpOptions);
   }
@@ -143,25 +141,28 @@ export class SysService {
   // Возвращает сигнатуру, кодированную ключем яндекс.навигатора
   // @lat - широта
   // @lon - долгота
-  public getYandexnaviSignature(lat: string, lon: string): Observable<Response> {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/admin/accessKeySignature/index.php?LAT=${lat}&LON=${lon}`;
+  public getYandexnaviSignature(
+    lat: string,
+    lon: string
+  ): Observable<Response> {
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/admin/accessKeySignature/index.php?LAT=${lat}&LON=${lon}`;
     return this.http.get<Response>(url);
   }
 
   // Проверка на авторизованность
   public checkAuth() {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/mobile/orders`;
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/mobile/orders`;
     const data = {
-      action: 'checkAuth',
-      uuid: this.getUuid()
+      action: "checkAuth",
+      uuid: this.getUuid(),
     };
-    if (localStorage.debug == 'true') {
-      data.uuid = '6b356755575fce31';
+    if (localStorage.debug == "true") {
+      data.uuid = "6b356755575fce31";
     }
 
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-type': 'application/json'
+        "Content-type": "application/json",
       }),
     };
     return this.http.post(url, data, httpOptions);
@@ -172,74 +173,85 @@ export class SysService {
       quality: 10,
       destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.JPEG,
-      mediaType: this.camera.MediaType.PICTURE
+      mediaType: this.camera.MediaType.PICTURE,
     };
     return this.camera.getPicture(options);
   }
 
   // Проверяет, отметил ли курьер, что едет на работу
   // @cId - ид курьера
-  public isCheckedToWork(cId: string): Observable<{ success: boolean, checked: boolean }> {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/admin/ajax/is_checked_to_work.php`;
+  public isCheckedToWork(
+    cId: string
+  ): Observable<{ success: boolean; checked: boolean }> {
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/admin/ajax/is_checked_to_work.php`;
     const data = {
-      token: 'l;sdfjkhglsoapl[',
-      cId
+      token: "l;sdfjkhglsoapl[",
+      cId,
     };
     const headers = {
-      'Content-type': 'application/json'
+      "Content-type": "application/json",
     };
-    return this.http.post<{ success: boolean, checked: boolean }>(url, data, { headers });
+    return this.http.post<{ success: boolean; checked: boolean }>(url, data, {
+      headers,
+    });
   }
 
   // Отметить "еду на работу"
   // @cId - ид курьера
   public check_to_work(cId: string) {
-    const url = `${this.proxy}https://mobile.postsrvs.ru/admin/ajax/check_to_work.php`;
+    const url = `${this.proxy}https://mobile2.postsrvs.ru/admin/ajax/check_to_work.php`;
     const data = {
       cId,
-      token: 'l;sdfjkhglsoapl[',
+      token: "l;sdfjkhglsoapl[",
     };
     const headers = new HttpHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Content-type': 'application/json'
+      "Access-Control-Allow-Origin": "*",
+      "Content-type": "application/json",
     });
     return this.http.post(url, data, { headers });
   }
 
   // Обработка интентов
   public intentStart(url: string, pkg: string) {
-    console.log('sys:: intent url: ', url);
+    console.log("sys:: intent url: ", url);
     const options = {
       action: this.wi.ACTION_VIEW,
       url,
-      package: pkg
+      package: pkg,
     };
     this.wi.startActivity(options).then((data) => {
-      console.log('sys:: Обработчик интента запущен', data);
+      console.log("sys:: Обработчик интента запущен", data);
     });
   }
 
   public getUuid() {
-    if (this.device.platform == 'browser') return 'webapp';
+    if (this.device.platform == "browser") return "webapp";
     return this.device.uuid;
   }
 
-  public async showConfirmAlert(header: string, message: string, handlers: { ok: any, cancel: any }) {
+  public async showConfirmAlert(
+    header: string,
+    message: string,
+    handlers: { ok: any; cancel: any }
+  ) {
     const alert = await this.alert.create({
       header,
       message,
-      buttons: [{
-        text: 'Отмена',
-        role: 'cancel',
-        handler: () => {
-          handlers.cancel();
-        }
-      }, {
-        text: 'Ок',
-        handler: () => {
-          handlers.ok();
-        }
-      }]
+      buttons: [
+        {
+          text: "Отмена",
+          role: "cancel",
+          handler: () => {
+            handlers.cancel();
+          },
+        },
+        {
+          text: "Ок",
+          handler: () => {
+            handlers.ok();
+          },
+        },
+      ],
     });
 
     await alert.present();

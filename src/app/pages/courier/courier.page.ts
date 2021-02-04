@@ -3,59 +3,73 @@ import {
   state,
   style,
   transition,
-  trigger
-} from '@angular/animations';
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { Router } from '@angular/router';
-import { IntroJsService } from '@esfaenza/ngx-introjs';
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
-import { CallNumber } from '@ionic-native/call-number/ngx';
-import { FirebaseX } from '@ionic-native/firebase-x/ngx';
-import { Network } from '@ionic-native/network/ngx';
-import { Vibration } from '@ionic-native/vibration/ngx';
-import { Platform, PopoverController } from '@ionic/angular';
-import { Observable, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import { Order } from 'src/app/interfaces/order';
-import { LoggerService } from 'src/app/services/sys/logger.service';
-import { MapService } from 'src/app/services/sys/map.service';
-import { HelpComponent } from '../../components/help/help.component';
-import { NoteComponent } from '../../components/note/note.component';
-import { ScanPVZResponse } from '../../interfaces/scan-pvzresponse';
-import { AuthService } from '../../services/auth.service';
-import { CourierService } from '../../services/courier.service';
-import { SettingsService } from '../../services/settings.service';
-import { StateService } from '../../services/state.service';
-import { SysService } from '../../services/sys.service';
-import { DataService } from '../../services/sys/data.service';
-import { OrderService } from '../../services/sys/order.service';
+  trigger,
+} from "@angular/animations";
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDropList,
+  moveItemInArray,
+} from "@angular/cdk/drag-drop";
+import { HttpClient } from "@angular/common/http";
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from "@angular/core";
+import { Router } from "@angular/router";
+import { IntroJsService } from "@esfaenza/ngx-introjs";
+import { BarcodeScanner } from "@ionic-native/barcode-scanner/ngx";
+import { CallNumber } from "@ionic-native/call-number/ngx";
+import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+import { Network } from "@ionic-native/network/ngx";
+import { Vibration } from "@ionic-native/vibration/ngx";
+import { Platform, PopoverController } from "@ionic/angular";
+import { Observable, Subject } from "rxjs";
+import { map, takeUntil } from "rxjs/operators";
+import { Order } from "src/app/interfaces/order";
+import { LoggerService } from "src/app/services/sys/logger.service";
+import { MapService } from "src/app/services/sys/map.service";
+import { HelpComponent } from "../../components/help/help.component";
+import { NoteComponent } from "../../components/note/note.component";
+import { ScanPVZResponse } from "../../interfaces/scan-pvzresponse";
+import { AuthService } from "../../services/auth.service";
+import { CourierService } from "../../services/courier.service";
+import { SettingsService } from "../../services/settings.service";
+import { StateService } from "../../services/state.service";
+import { SysService } from "../../services/sys.service";
+import { DataService } from "../../services/sys/data.service";
+import { OrderService } from "../../services/sys/order.service";
 
 @Component({
-  selector: 'app-courier',
-  templateUrl: './courier.page.html',
-  styleUrls: ['./courier.page.scss'],
+  selector: "app-courier",
+  templateUrl: "./courier.page.html",
+  styleUrls: ["./courier.page.scss"],
   animations: [
-    trigger('openClose', [
+    trigger("openClose", [
       // ...
-      state('open', style({
-        height: 'auto',
-      })),
-      state('closed', style({
-        height: 'max-content',
-      })),
-      transition('open => closed', [
-        animate('0.5s')
-      ]),
-      transition('closed => open', [
-        animate('0.5s')
-      ]),
-    ])
-  ]
+      state(
+        "open",
+        style({
+          height: "auto",
+        })
+      ),
+      state(
+        "closed",
+        style({
+          height: "max-content",
+        })
+      ),
+      transition("open => closed", [animate("0.5s")]),
+      transition("closed => open", [animate("0.5s")]),
+    ]),
+  ],
 })
 export class CourierPage implements OnInit {
-  @ViewChild('sInput') public sInput: ElementRef;
+  @ViewChild("sInput") public sInput: ElementRef;
   @ViewChild(CdkDropList, { static: false }) Drop_L: CdkDropList;
   @ViewChildren(CdkDrag) DragItems: QueryList<CdkDrag>;
 
@@ -69,14 +83,14 @@ export class CourierPage implements OnInit {
   public g_done = 0;
   public g_process = 0;
   public g_fail = 0;
-  public lvl_ind = { width: '0%' };
+  public lvl_ind = { width: "0%" };
   public subBtnCond = false;
   public scanView = false;
   public scanInput: string;
   public scan_process = false;
   public find_order = false;
   public isWorkEnded = false;
-  public searchString = '';
+  public searchString = "";
   public orders_c: Observable<Order[]>;
   public slicer: number = this.howSlice();
   public callWindow = false;
@@ -86,11 +100,11 @@ export class CourierPage implements OnInit {
   public noDrag = false;
   private segment: number[] = [1];
   public IntroItems = {
-    Group: '2',
-    1: 'Сканирование штрихкода заказа, поиск по штрихкоду',
-    2: 'Текстовый поиск заказов по адресу, ФИО и компании',
-    3: 'Показать быстрые действия',
-    4: 'Сканировать QR-код на складе, чтобы отметиться'
+    Group: "2",
+    1: "Сканирование штрихкода заказа, поиск по штрихкоду",
+    2: "Текстовый поиск заказов по адресу, ФИО и компании",
+    3: "Показать быстрые действия",
+    4: "Сканировать QR-код на складе, чтобы отметиться",
   };
   public wayRequested = false;
   public isIOS = false;
@@ -124,7 +138,7 @@ export class CourierPage implements OnInit {
 
     this.state$.state.pipe(takeUntil(this.local_stop$)).subscribe((state) => {
       const a = state;
-      if (state === 'orders_init') {
+      if (state === "orders_init") {
         self.initContent();
       }
     });
@@ -133,27 +147,27 @@ export class CourierPage implements OnInit {
     this.orders_c = this.data.orders;
     this.prepareOrdersList();
     this.platform.ready().then(() => {
-      this.isIOS = this.platform.is('ios');
-    })
+      this.isIOS = this.platform.is("ios");
+    });
   }
 
   public initConditions() {
     const app_mode = this.settings.rules.appMode;
     switch (app_mode) {
-      case 'fullAuto':
+      case "fullAuto":
         if (!this.state$.confirmed) {
           this.subBtnCond = true;
         }
         break;
-      case 'auto':
+      case "auto":
         this.subBtnCond = false;
         break;
-      case 'fullHand':
+      case "fullHand":
         if (!this.state$.confirmed) {
           this.subBtnCond = true;
         }
         break;
-      case 'hand':
+      case "hand":
         this.subBtnCond = false;
         break;
     }
@@ -165,48 +179,52 @@ export class CourierPage implements OnInit {
       this.DragItems.forEach((DragItem) => {
         DragItem.dragStartDelay = {
           touch: 500,
-          mouse: 100
+          mouse: 100,
         };
       });
     });
   }
 
   ngOnInit() {
-    this.settings.checkout = !!(Number(this.settings.rules.storeCheckMode));
+    this.settings.checkout = !!Number(this.settings.rules.storeCheckMode);
     if (!this.settings.checkout) {
-      this.auth.checkState = 'checkedOut';
+      this.auth.checkState = "checkedOut";
     } else {
       this.auth.checkState = `checked${localStorage.check}`;
     }
-    if (this.settings.rules.appMode.toLowerCase().includes('auto')) {
+    if (this.settings.rules.appMode.toLowerCase().includes("auto")) {
       this.noDrag = true;
     }
-    this.firebase.setScreenName('courier');
+    this.firebase.setScreenName("courier");
     this.isRouteStarted && this.data.getApiData();
   }
 
   get isRouteStarted() {
-    return !!localStorage.routeStarted
+    return !!localStorage.routeStarted;
   }
   set isRouteStarted(isStarted: boolean) {
     if (isStarted) {
       localStorage.routeStarted = isStarted;
     } else {
-      localStorage.removeItem('routeStarted');
+      localStorage.removeItem("routeStarted");
     }
 
-    isStarted && this.logger.profile('Кнопка старта маршрута ==> стейт isRouteStarted', true);
+    isStarted &&
+      this.logger.profile(
+        "Кнопка старта маршрута ==> стейт isRouteStarted",
+        true
+      );
   }
   public scanInputStart() {
     const self = this;
     this.scanView = !this.scanView;
     this.loader = true;
-    if (this.auth.getScanMode() === 'scan') {
+    if (this.auth.getScanMode() === "scan") {
       self.courier.findOrder(this.scanInput).subscribe((res) => {
         self.scanInput = null;
-        if (res.success == 'true') {
+        if (res.success == "true") {
           self.courier.sumbitOrder(res.order_id).subscribe((re_s) => {
-            console.log('courier_page sbo resp', re_s);
+            console.log("courier_page sbo resp", re_s);
             if (re_s) {
               self.submitOrder();
             } else {
@@ -221,7 +239,7 @@ export class CourierPage implements OnInit {
         }
         self.state$.confirmed = true;
         self.orders.forEach((order: any) => {
-          if (order.confirm == '0') {
+          if (order.confirm == "0") {
             self.state$.confirmed = false;
           }
         });
@@ -233,7 +251,7 @@ export class CourierPage implements OnInit {
   }
 
   public scanInputChange() {
-    console.log('inputData', this.scanInput);
+    console.log("inputData", this.scanInput);
     const self = this;
     if (this.scan_process) {
       return false;
@@ -252,8 +270,8 @@ export class CourierPage implements OnInit {
 
   public submitOrder() {
     const self = this;
-    console.log('SUBMIT_ORDER_CALL');
-    if (this.auth.getScanMode() == 'scan') {
+    console.log("SUBMIT_ORDER_CALL");
+    if (this.auth.getScanMode() == "scan") {
       this.scanView = !this.scanView;
       setTimeout(() => {
         self.sInput.nativeElement.focus();
@@ -261,10 +279,10 @@ export class CourierPage implements OnInit {
       return false;
     }
     this.bs.scan().then((data) => {
-      if (data.text != '') {
+      if (data.text != "") {
         self.loader = true;
         self.courier.findOrder(data.text).subscribe((res) => {
-          if (res.success == 'true') {
+          if (res.success == "true") {
             self.courier.sumbitOrder(res.order_id).subscribe((re_s) => {
               if (re_s) {
                 self.submitOrder();
@@ -277,7 +295,7 @@ export class CourierPage implements OnInit {
           }
           self.state$.confirmed = true;
           self.orders.forEach((order: any) => {
-            if (order.confirm == '0') {
+            if (order.confirm == "0") {
               self.state$.confirmed = false;
             }
           });
@@ -293,36 +311,36 @@ export class CourierPage implements OnInit {
     this.state$.orders_page_check = false;
   }
 
-
   public initContent() {
     const self = this;
     this.data.orders.subscribe((orders: Order[]) => {
       this.orders = orders;
-      console.log('sys::initСontent orders', this.orders);
+      console.log("sys::initСontent orders", this.orders);
       this.statuses = [
         {
-          id: 4, status: 'Не доставлено'
+          id: 4,
+          status: "Не доставлено",
         },
         {
-          id: 5, status: 'Доставлено'
+          id: 5,
+          status: "Доставлено",
         },
         {
-          id: 6, status: 'Частично доставлено'
-        }
+          id: 6,
+          status: "Частично доставлено",
+        },
       ];
       this.ordersInit = true;
       self.count_orders();
     });
   }
 
-
   public getStatus(order: Order) {
     return this.courier.getStatus(order);
   }
 
   public selectOrder(id: string) {
-
-    this.router.navigate(['order', id]);
+    this.router.navigate(["order", id]);
   }
 
   public tabSelect(tab: number) {
@@ -332,7 +350,6 @@ export class CourierPage implements OnInit {
   trackFn(index: number, el: any): number {
     return el.id;
   }
-
 
   public getCondition(status: number) {
     switch (this.selectedTab) {
@@ -362,16 +379,16 @@ export class CourierPage implements OnInit {
 
     for (let i = 0; i < orders.length; i++) {
       switch (String(orders[i].status_id)) {
-        case '4':
+        case "4":
           g_fail++;
           break;
-        case '5':
+        case "5":
           g_done++;
           break;
-        case '6':
+        case "6":
           g_done++;
           break;
-        case '1':
+        case "1":
           g_process++;
           break;
       }
@@ -382,17 +399,17 @@ export class CourierPage implements OnInit {
   }
 
   public startRoute(start = true, stop = false) {
-    this.logger.profile('Кнопка старта маршрута ==> стейт isRouteStarted');
+    this.logger.profile("Кнопка старта маршрута ==> стейт isRouteStarted");
     this.loader = true;
     const self = this;
     this.auth.checkAuth().subscribe((data) => {
-      if (data.success == 'true') {
+      if (data.success == "true") {
         self.sendStartRoute(data.sync_id, start, stop).then(() => {
           this.loader = false;
           this.isRouteStarted = !stop;
         });
       } else {
-        this.loader = false
+        this.loader = false;
       }
     });
   }
@@ -401,35 +418,39 @@ export class CourierPage implements OnInit {
     this.startRoute(false, true);
   }
 
-
   public async sendStartRoute(cid: number, start: boolean, stop: boolean) {
-    const url = 'geo/route_start.php';
+    const url = "geo/route_start.php";
     const currentLocation = await this.map.getMyLocation();
     const data = {
       cid,
       lt: currentLocation.latLng.lat,
       lg: currentLocation.latLng.lng,
-      start: '',
-      stop: ''
+      start: "",
+      stop: "",
     };
     if (start) {
-      data.start = '1';
+      data.start = "1";
     }
     if (stop) {
-      data.stop = '1';
+      data.stop = "1";
     }
     const self = this;
     this.auth.sendPost(url, data).subscribe((data) => {
       if (data.success == true) {
         self.isRouteStarted = !stop;
         this.wayRequested = true;
-        this.map.getWay({ lt: currentLocation.latLng.lat, lg: currentLocation.latLng.lng }).subscribe((orders) => {
-          this.wayRequested = false;
-          this.data.orders.next(orders);
-          this.map.showRoute(orders[0])
-        })
+        this.map
+          .getWay({
+            lt: currentLocation.latLng.lat,
+            lg: currentLocation.latLng.lng,
+          })
+          .subscribe((orders) => {
+            this.wayRequested = false;
+            this.data.orders.next(orders);
+            this.map.showRoute(orders[0]);
+          });
       } else {
-        this.sys.presentToast('Попробуйте еще раз', 'danger', 'Ошибка')
+        this.sys.presentToast("Попробуйте еще раз", "danger", "Ошибка");
       }
     });
   }
@@ -438,10 +459,10 @@ export class CourierPage implements OnInit {
     const self = this;
     this.scanView = !this.scanView;
     this.loader = true;
-    if (this.auth.getScanMode() == 'scan') {
+    if (this.auth.getScanMode() == "scan") {
       self.courier.findOrder(this.scanInput).subscribe((res) => {
         self.scanInput = null;
-        if (res.success == 'true') {
+        if (res.success == "true") {
           self.selectOrder(res.order_id);
         } else {
           self.auth.showError(2);
@@ -458,7 +479,7 @@ export class CourierPage implements OnInit {
 
   public findOrder() {
     const self = this;
-    if (this.auth.getScanMode() == 'scan') {
+    if (this.auth.getScanMode() == "scan") {
       this.scanView = !this.scanView;
       this.find_order = true;
       setTimeout(() => {
@@ -469,7 +490,7 @@ export class CourierPage implements OnInit {
 
     this.bs.scan().then((data) => {
       self.courier.findOrder(data.text).subscribe((res) => {
-        if (res.success == 'true') {
+        if (res.success == "true") {
           self.selectOrder(res.order_id);
         } else {
           self.auth.showError(2);
@@ -480,26 +501,25 @@ export class CourierPage implements OnInit {
 
   // Завершение рабочего дня курьера
   public endWork() {
-    this.courier.endWork().subscribe((data: { success: boolean }) => {
-      if (data.success) {
-        this.isWorkEnded = true;
-        this.sys.presentToast('Рабочий день завершен',
-          'success');
-      }
-    },
+    this.courier.endWork().subscribe(
+      (data: { success: boolean }) => {
+        if (data.success) {
+          this.isWorkEnded = true;
+          this.sys.presentToast("Рабочий день завершен", "success");
+        }
+      },
       (error) => {
-        this.sys.presentToast(`Ошибка: ${error.message}`, 'danger');
-      });
-
+        this.sys.presentToast(`Ошибка: ${error.message}`, "danger");
+      }
+    );
   }
   doRefresh() {
     this.data.getApiData();
-
   }
 
   public segmentChanged(event: any) {
     const ids = [Number(event.target.value)];
-    if (event.target.value == '5') {
+    if (event.target.value == "5") {
       ids.push(6);
     }
     this.segment = ids;
@@ -509,30 +529,40 @@ export class CourierPage implements OnInit {
   public onSearchChange(event: any) {
     this.searchString = event.target.value;
     this.prepareOrdersList(this.segment);
-
   }
   public prepareOrdersList(ids = this.segment) {
     this.orders_c = this.data.orders.pipe(
       map(
-        (orders) => orders && orders.filter((order) => ids.includes(Number(order.status_id)))
-          .filter(
-            (order) => order.client_address.toLowerCase().includes(this.searchString.toLowerCase()) || order.client_fio.toLowerCase().includes(this.searchString.toLowerCase()) ||
-              (order.client_id as string).toLowerCase().includes(this.searchString.toLowerCase())
-          )
-          .slice(this.slicer)
+        (orders) =>
+          orders &&
+          orders
+            .filter((order) => ids.includes(Number(order.status_id)))
+            .filter(
+              (order) =>
+                order.client_address
+                  .toLowerCase()
+                  .includes(this.searchString.toLowerCase()) ||
+                order.client_fio
+                  .toLowerCase()
+                  .includes(this.searchString.toLowerCase()) ||
+                (order.client_id as string)
+                  .toLowerCase()
+                  .includes(this.searchString.toLowerCase())
+            )
+            .slice(this.slicer)
       ),
-      map(
-        (orders) => {
-          orders.forEach((order) => {
-            order.show = false;
-          }); this.orders = orders; return orders;
-        }
-      )
+      map((orders) => {
+        orders.forEach((order) => {
+          order.show = false;
+        });
+        this.orders = orders;
+        return orders;
+      })
     );
-    this.data.orders.next(this.data.orders.getValue())
+    this.data.orders.next(this.data.orders.getValue());
   }
   public howSlice(): number {
-    return (this.settings.rules.typeRoute === 'standart' ? 0 : 1);
+    return this.settings.rules.typeRoute === "standart" ? 0 : 1;
   }
 
   async popoverHelp(ev: any) {
@@ -540,18 +570,18 @@ export class CourierPage implements OnInit {
       component: HelpComponent,
       event: ev,
       translucent: true,
-      cssClass: 'help'
+      cssClass: "help",
     });
     return popover;
   }
 
   public showHelp() {
     this.introService.intro
-      .setOption('prevLabel', 'Назад')
-      .setOption('nextLabel', 'Далее')
-      .setOption('skipLabel', 'Пропустить')
-      .setOption('doneLabel', 'Завершить');
-    this.introService.start(null, '2');
+      .setOption("prevLabel", "Назад")
+      .setOption("nextLabel", "Далее")
+      .setOption("skipLabel", "Пропустить")
+      .setOption("doneLabel", "Завершить");
+    this.introService.start(null, "2");
   }
 
   public showRoute(order: Order) {
@@ -561,7 +591,7 @@ export class CourierPage implements OnInit {
   public drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.orders, event.previousIndex, event.currentIndex);
     this.data.rewriteOrders(this.orders);
-    console.log('sys:: массив заказов после перетаскивания: ', this.orders);
+    console.log("sys:: массив заказов после перетаскивания: ", this.orders);
   }
 
   async popoverNote(ev: any, orderId: string) {
@@ -569,10 +599,10 @@ export class CourierPage implements OnInit {
       component: NoteComponent,
       event: ev,
       translucent: true,
-      cssClass: 'help',
+      cssClass: "help",
       componentProps: {
-        orderId
-      }
+        orderId,
+      },
     });
     return popover;
   }
@@ -592,28 +622,28 @@ export class CourierPage implements OnInit {
     }
 
     switch (action) {
-      case 'init':
+      case "init":
         this.callWindow = !this.callWindow;
         break;
-      case 'phone':
-        this.CL.callNumber(this.selectedPhone, false).then(() => { });
+      case "phone":
+        this.CL.callNumber(this.selectedPhone, false).then(() => {});
         this.callWindow = false;
         this.order = undefined;
         break;
-      case 'operator':
-        if (this.network.type == 'none') {
-          this.phoneClick('phone', order);
+      case "operator":
+        if (this.network.type == "none") {
+          this.phoneClick("phone", order);
           return false;
         }
         if (this.selectedPhone && courierPhone) {
-          const url = 'orders';
+          const url = "orders";
           const data = {
-            action: 'send_phone',
+            action: "send_phone",
             client_number: this.selectedPhone,
             cur_number: courierPhone,
           };
           this.auth.sendPost(url, data).subscribe((resp) => {
-            console.log('call_subs', resp);
+            console.log("call_subs", resp);
           });
           this.auth.showError(9);
           this.callWindow = false;
@@ -625,47 +655,45 @@ export class CourierPage implements OnInit {
 
   // Парсинг номера телефона из строки с лишним мусором
   public parsePhone(phone: string): Array<string> {
-    return this.orderService.parsePhone(phone)
+    return this.orderService.parsePhone(phone);
   }
 
   // Жонглирование '8' / '+7'
   private normalizePhoneNumber(phone: string): string {
-    if (phone[0] !== '8' && phone[0] !== '7' && phone.length !== 11) {
+    if (phone[0] !== "8" && phone[0] !== "7" && phone.length !== 11) {
       phone = `8${phone}`;
     }
     if (phone.length == 7 || phone.length == 10) {
       phone = `8${phone}`;
     }
-    if (phone[0] !== '8' && phone.length == 11) {
+    if (phone[0] !== "8" && phone.length == 11) {
       phone = `8${phone.slice(1)}`;
     }
     return phone;
   }
 
-
   public vibr($event?: any) {
     this.vbr.vibrate(10);
-    console.log('sys:: *Вибирация*');
+    console.log("sys:: *Вибирация*");
   }
 
   public getScanData() {
     this.bs.scan().then((data) => {
       console.log(`sys:: данные штрихкода: ${data.text}`);
-      const url = `${this.sys.proxy}https://mobile.postsrvs.ru/getScanPVZ.php`;
+      const url = `${this.sys.proxy}https://mobile2.postsrvs.ru/getScanPVZ.php`;
       const reqData = {
-        type: 'scanOrder',
+        type: "scanOrder",
         uuid: this.auth.getUuid(),
         courieriId: this.auth.getUserId(),
-        clientId: data.text
+        clientId: data.text,
       };
       this.http.post(url, reqData).subscribe((resp: ScanPVZResponse) => {
-        let color = 'success';
+        let color = "success";
         if (!resp.success) {
-          color = 'danger';
+          color = "danger";
         }
-        this.sys.presentToast(resp.dateTime, 'success', resp.message);
+        this.sys.presentToast(resp.dateTime, "success", resp.message);
       });
-
     });
   }
 
@@ -682,17 +710,20 @@ export class CourierPage implements OnInit {
       const hour = 3600000;
       const deadline = new Date(order.datetime_to);
       const now = new Date();
-      warnTime = (new Date(deadline.getTime() - hour) <= now);
+      warnTime = new Date(deadline.getTime() - hour) <= now;
     } else {
       warnTime = false;
     }
-    return warnTime && (order.status_id == 1);
+    return warnTime && order.status_id == 1;
   }
 
   //проверяет необходимость подсветки заказа красным
   public isOverdueTime(order: Order) {
-    const isOverTime: boolean = (new Date(order.datetime_to).getTime() < new Date().getTime());
-    return ((order.overdue == '1' || order.required == true || isOverTime) && order.status_id == 1)
+    const isOverTime: boolean =
+      new Date(order.datetime_to).getTime() < new Date().getTime();
+    return (
+      (order.overdue == "1" || order.required == true || isOverTime) &&
+      order.status_id == 1
+    );
   }
-
 }
