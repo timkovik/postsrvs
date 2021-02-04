@@ -79,7 +79,7 @@ export class DataService {
 
   public getBalance(sync_id: number, more = 0) {
     const uuid = this.sys.getUuid();
-    const url = `${this.sys.proxy}https://terminal.vestovoy.ru/info/stat.php?cid=${sync_id}&more=${more}&uuid=${uuid}&CL=`;
+    const url = `${this.sys.proxy}https://terminal.vestovoy.ru/info/stat2.php?cid=${sync_id}&more=${more}&uuid=${uuid}&CL=`;
     return this.http.get(url);
   }
 

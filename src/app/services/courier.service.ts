@@ -260,7 +260,7 @@ export class CourierService {
     const uuid = this.sys.getUuid();
 
     const CL = this.settings.get("cl"),
-      url = `${this.sys.proxy}https://terminal.vestovoy.ru/info/stat.php?cid=${sync_id}&more=${more}&uuid=${uuid}&CL=${CL}`;
+      url = `${this.sys.proxy}https://terminal.vestovoy.ru/info/stat2.php?cid=${sync_id}&more=${more}&uuid=${uuid}&CL=${CL}`;
     return this.http.get(url);
   }
 
