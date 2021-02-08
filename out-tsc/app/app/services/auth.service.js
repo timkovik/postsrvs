@@ -1,15 +1,14 @@
-import { __awaiter, __decorate, __metadata } from "tslib";
-import { Injectable } from '@angular/core';
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { Device } from '@ionic-native/device/ngx';
-import { Platform } from '@ionic/angular';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { StateService } from './state.service';
-import { AlertController } from '@ionic/angular';
-import { SettingsService } from './settings.service';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
+import { Device } from '@ionic-native/device/ngx';
+import { AlertController, Platform } from '@ionic/angular';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { __awaiter, __decorate, __metadata } from "tslib";
 import { SysService } from '../services/sys.service';
+import { SettingsService } from './settings.service';
+import { StateService } from './state.service';
 let AuthService = class AuthService {
     constructor(bScan, http, device, plt, router, state$, alert, settings, sys) {
         this.bScan = bScan;
@@ -231,12 +230,14 @@ let AuthService = class AuthService {
     check(mode) {
         this.bScan.scan().then((scanData) => {
             console.log('sys:: auth.check() данные qr-кода: ', scanData);
+            const uuid = this.sys.getUuid();
             let url = this.sys.proxy + 'https://postsrvs.ru/admin/ajax/wh.php';
             let data = {
-                'cId': this.getUserId(),
-                'token': "l;sdfjkhglsoapl[",
-                'qr': scanData.text,
-                'mode': 'check' + mode
+              cId: this.getUserId(),
+              token: "l;sdfjkhglsoapl[",
+              qr: scanData.text,
+              mode: "check" + mode,
+              uuid: uuid,
             };
             const headers = new HttpHeaders({
                 'Access-Control-Allow-Origin': '*',

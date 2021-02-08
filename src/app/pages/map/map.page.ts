@@ -329,9 +329,9 @@ export class MapPage implements OnInit {
       icons: [
         {
           min: 2,
-          url: './assets/markercluster/pipka.png',
+          url: "./assets/markercluster/mark.svg",
           label: {
-            color: 'black',
+            color: "data:image/svg+xml;utf-8,",
             bold: true,
             fontSize: 16,
           },

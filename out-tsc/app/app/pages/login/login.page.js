@@ -1,18 +1,17 @@
-import { __decorate, __metadata } from "tslib";
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
-import { Platform } from '@ionic/angular';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from '../../services/auth.service';
-import { StateService } from '../../services/state.service';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { CourierService } from '../../services/courier.service';
 import { AppVersion } from '@ionic-native/app-version/ngx';
-import { trigger, state, style, animate, transition, } from '@angular/animations';
-import { takeUntil } from 'rxjs/operators';
+import { AlertController, Platform } from '@ionic/angular';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { __decorate, __metadata } from "tslib";
+import { AuthService } from '../../services/auth.service';
+import { CourierService } from '../../services/courier.service';
 import { SettingsService } from '../../services/settings.service';
+import { StateService } from '../../services/state.service';
 import { SysService } from '../../services/sys.service';
 let LoginPage = class LoginPage {
     constructor(auth, router, alert, plt, http, state$, AP, courier, appVersion, settings, sys) {
@@ -74,10 +73,12 @@ let LoginPage = class LoginPage {
         }
     }
     isCheckedToWork() {
+        const uuid = this.sys.getUuid();
         const url = this.sys.proxy + 'https://mobile.postsrvs.ru/admin/ajax/is_checked_to_work.php';
         let data = {
-            "token": "l;sdfjkhglsoapl[",
-            "cId": localStorage.userId
+          token: "l;sdfjkhglsoapl[",
+          cId: localStorage.userId,
+          uuid: uuid,
         };
         const headers = {
             'Content-type': 'application/json'

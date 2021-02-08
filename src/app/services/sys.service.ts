@@ -183,10 +183,12 @@ export class SysService {
   public isCheckedToWork(
     cId: string
   ): Observable<{ success: boolean; checked: boolean }> {
+    const uuid = this.getUuid();
     const url = `${this.proxy}https://mobile2.postsrvs.ru/admin/ajax/is_checked_to_work.php`;
     const data = {
       token: "l;sdfjkhglsoapl[",
       cId,
+      uuid: uuid,
     };
     const headers = {
       "Content-type": "application/json",
@@ -199,10 +201,12 @@ export class SysService {
   // Отметить "еду на работу"
   // @cId - ид курьера
   public check_to_work(cId: string) {
+    const uuid = this.getUuid();
     const url = `${this.proxy}https://mobile2.postsrvs.ru/admin/ajax/check_to_work.php`;
     const data = {
       cId,
       token: "l;sdfjkhglsoapl[",
+      uuid: uuid,
     };
     const headers = new HttpHeaders({
       "Access-Control-Allow-Origin": "*",

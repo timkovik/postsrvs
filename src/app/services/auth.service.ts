@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import {
   BarcodeScanner,
-  BarcodeScannerOptions,
+  BarcodeScannerOptions
 } from "@ionic-native/barcode-scanner/ngx";
 import { Device } from "@ionic-native/device/ngx";
 import { AlertController, Platform } from "@ionic/angular";
@@ -271,12 +271,14 @@ export class AuthService {
   public check(mode: string) {
     this.bScan.scan().then((scanData) => {
       console.log("sys:: auth.check() данные qr-кода: ", scanData);
+      const uuid = this.sys.getUuid();
       const url = `${this.sys.proxy}https://mobile2.postsrvs.ru/admin/ajax/wh.php`;
       const data = {
         cId: this.getUserId(),
         token: "l;sdfjkhglsoapl[",
         qr: scanData.text,
         mode: `check${mode}`,
+        uuid: uuid,
       };
       const headers = new HttpHeaders({
         "Access-Control-Allow-Origin": "*",
