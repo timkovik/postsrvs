@@ -1,0 +1,30 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "Postsrvs",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {
+    "preferences": {
+      "WKWebViewOnly": "true",
+      "android-usesCleartextTraffic": "true",
+      "ScrollEnabled": "false",
+      "android-minSdkVersion": "23",
+      "BackupWebStorage": "none",
+      "SplashMaintainAspectRatio": "true",
+      "FadeSplashScreenDuration": "300",
+      "SplashShowOnlyFirstTime": "false",
+      "SplashScreen": "screen",
+      "SplashScreenDelay": "3000",
+      "GOOGLE_MAPS_ANDROID_API_KEY": "AIzaSyDSWxDW_twugay-5q2T3aEuER8Lph5d164",
+      "GOOGLE_MAPS_IOS_API_KEY": "AIzaSyDSWxDW_twugay-5q2T3aEuER8Lph5d164",
+      "Hostname": "localhost",
+      "Scheme": "http"
+    }
+  }
+}

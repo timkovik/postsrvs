@@ -4,7 +4,8 @@
     "cordova": {
       "android": "9.0.0",
       "ios": "6.1.1"
-    }
+    },
+    "capacitor": {}
   },
   "type": "angular",
   "hooks": {
